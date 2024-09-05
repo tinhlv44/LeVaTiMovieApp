@@ -39,6 +39,10 @@ export default function HomeScreens() {
 
         <MovieList title={'Up Coming'} data={upcoming}/>
 
+        {/* {Top Ratting Movie} */}
+
+        <MovieList title={'Up Coming'} data={upcoming}/>
+
       </ScrollView>
     </View>
   );
@@ -52,7 +56,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   viewSafe: {
-    paddingTop: currentHeightStatusBar,
+    paddingTop: currentHeightStatusBar+6,
   },
   barMenu: {
     width:'100%',

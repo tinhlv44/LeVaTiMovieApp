@@ -1,7 +1,7 @@
 import { View, Text , StyleSheet, Image, TouchableWithoutFeedback, Dimensions} from 'react-native'
 import React from 'react'
 //import Carousel from 'react-native-snap-carousel';
-//import Swiper from 'react-native-swiper';
+import Swiper from 'react-native-swiper';
 import { useNavigation } from '@react-navigation/native';
 
 var {width, height} = Dimensions.get('window');
@@ -9,11 +9,15 @@ var {width, height} = Dimensions.get('window');
 export default function TrendingMovie({data}) {
     const navigation = useNavigation();
     const handleClick = () =>{
-        navigation.navigate('Movie', item);
+        navigation.navigate('Movie');//, item);
     }
   return (
     <View style={styles.container}>
       <Text style={styles.text}>TrendingMovie</Text>
+        {/* {data.reverse().map((item, index) => (
+            <MovieCard item={item} handleClick={handleClick}/>
+        ))}    */}
+        
         {/* <Carousel 
             data={data}
             renderItem={({item}) => <MovieCard item={item} handleClick={handleClick}/>}
@@ -23,7 +27,7 @@ export default function TrendingMovie({data}) {
             itemWidth={width*0.62}
             slideStyle={{display:'flex', alignItems:'center'}}
             /> */}
-        {/* <Swiper
+        <Swiper
             loop={true}
             autoplay={false}
             showsPagination={true}
@@ -37,7 +41,7 @@ export default function TrendingMovie({data}) {
                     item={item}
                     handleClick={handleClick}  />
             ))}
-        </Swiper> */}
+        </Swiper>
     </View>
   )
 }
@@ -57,7 +61,8 @@ const MovieCard = ({item, handleClick}) =>{
 }
 const styles = StyleSheet.create({
     container: {
-        marginBottom:8
+        marginBottom:8,
+        //flexDirection:'row'
     },
     text: {
         color:'white',
