@@ -3,18 +3,50 @@ import {
   Text,
   StyleSheet,
   Image,
-  TouchableWithoutFeedback,
+  TouchableOpacity,
   Dimensions,
+  TouchableWithoutFeedback,
 } from "react-native";
-import React from "react";
-import Carousel from 'react-native-snap-carousel-v4';
+import React, { useState } from "react";
+import Carousel, { Pagination } from "react-native-snap-carousel-v4";
 import { useNavigation } from "@react-navigation/native";
 import { img185, img342, img500 } from "../api/moviedb";
+import {
+  BORDERRADIUS,
+  COLORS,
+  FONTFAMILY,
+  FONTSIZE,
+  SPACING,
+} from "../constants/theme";
+import CustomIcon from "./CustomIcon";
 
 var { width, height } = Dimensions.get("window");
 
+const genres = {
+  28: "Action",
+  12: "Adventure",
+  16: "Animation",
+  35: "Comedy",
+  80: "Crime",
+  99: "Documentry",
+  18: "Drama",
+  10751: "Family",
+  14: "Fantasy",
+  36: "History",
+  27: "Horror",
+  10402: "Music",
+  9648: "Mystry",
+  10749: "Romance",
+  878: "Science Fiction",
+  10770: "TV Movie",
+  53: "Thriller",
+  10752: "War",
+  37: "Western",
+};
+
 export default function TrendingMovie({ data }) {
   const navigation = useNavigation();
+  const [activeIndex, setActiveIndex] = useState(0);
   const handleClick = (item) => {
     navigation.navigate("Movie", item);
   };
@@ -22,35 +54,80 @@ export default function TrendingMovie({ data }) {
     <View style={styles.container}>
       <Text style={styles.text}>Xu hướng</Text>
 
-      <Carousel 
-            data={data}
-            renderItem={({item}) => <MovieCard item={item} handleClick={handleClick}/>}
-            firstItem={1}
-            inactiveSlideOpacity={0.60}
-            sliderWidth={width}
-            itemWidth={width*0.62}
-            slideStyle={{display:'flex', alignItems:'center'}}
-            autoplay={true}
-            showsPagination={true}
-            loop={true}
-            />
+      <Carousel
+        data={data}
+        renderItem={({ item }) => (
+          <MovieCard item={item} handleClick={() => handleClick(item)} />
+        )}
+        firstItem={1}
+        inactiveSlideOpacity={0.2}
+        inactiveSlideScale={0.7}
+        sliderWidth={width}
+        itemWidth={width * 0.62}
+        slideStyle={{ display: "flex", alignItems: "center" }}
+        autoplay={true}
+        showsPagination={true}
+        autoplayDelay={5000} // Chờ 5 giây trước khi bắt đầu
+        autoplayInterval={7000} // 3 giây giữa mỗi slide
+      />
+      {/* <View>
+        <Pagination
+          dotsLength={data.length} // Số lượng dấu chấm
+          activeDotIndex={activeIndex} // Slide hiện tại
+          containerStyle={{ paddingVertical: 10 }}
+          dotStyle={{
+            width: 10,
+            height: 10,
+            borderRadius: 5,
+            backgroundColor: "red", // Màu dấu chấm active,
+            margin: 0,
+            padding: 0,
+          }}
+          inactiveDotStyle={{
+            backgroundColor: "gray", // Màu dấu chấm inactive
+            margin: 0,
+            padding: 0,
+          }}
+          inactiveDotOpacity={0.4}
+          inactiveDotScale={0.6}
+        />
+      </View> */}
     </View>
   );
 }
 const MovieCard = ({ item, handleClick }) => {
+  //console.log(item)
   return (
-    <TouchableWithoutFeedback onPress={() => handleClick(item)}>
-      <Image
-        source={{
-          uri: img185(item.poster_path),
-          //   uri: "https://th.bing.com/th/id/OIP.DXi-IO1zd9_je9x1go-HqAHaKk?w=185&h=264&c=7&r=0&o=5&pid=1.7",
-        }}
-        style={{
-          width: width * 0.6,
-          height: height * 0.4,
-          borderRadius: 50,
-        }}
-      />
+    <TouchableWithoutFeedback onPress={handleClick}>
+      <View style={[styles.container]}>
+        <Image
+          style={[styles.cardImage, { width: width * 0.7 }]}
+          source={{ uri: img500(item.poster_path) }}
+        />
+
+        <View>
+          <View style={styles.rateContainer}>
+            <CustomIcon name="star" style={styles.starIcon} type="Entypo" />
+            <Text style={styles.voteText}>
+              {item.vote_average} ({item.vote_count})
+            </Text>
+          </View>
+
+          <Text numberOfLines={1} style={styles.textTitle}>
+            {item.title}
+          </Text>
+
+          <View style={styles.genreContainer}>
+            {item.genre_ids.map((items) => {
+              return (
+                <View key={items} style={styles.genreBox}>
+                  <Text style={styles.genreText}>{genres[items]}</Text>
+                </View>
+              );
+            })}
+          </View>
+        </View>
+      </View>
     </TouchableWithoutFeedback>
   );
 };
@@ -61,7 +138,56 @@ const styles = StyleSheet.create({
   text: {
     color: "white",
     fontSize: 20,
-    marginHorizontal: 4,
-    marginBottom: 4,
+    margin: 16,
+    fontWeight:'bold'
+  },
+  container: {},
+  cardImage: {
+    aspectRatio: 2 / 3,
+    borderRadius: BORDERRADIUS.radius_20,
+  },
+  textTitle: {
+    fontFamily: FONTFAMILY.poppins_regular,
+    fontSize: FONTSIZE.size_24,
+    color: COLORS.White,
+    textAlign: "center",
+    paddingVertical: SPACING.space_10,
+  },
+  rateContainer: {
+    flexDirection: "row",
+    gap: SPACING.space_10,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: SPACING.space_10,
+  },
+  starIcon: {
+    fontSize: FONTSIZE.size_20,
+    color: COLORS.Yellow,
+  },
+  voteText: {
+    fontFamily: FONTFAMILY.poppins_medium,
+    fontSize: FONTSIZE.size_14,
+    color: COLORS.White,
+  },
+  genreContainer: {
+    flexDirection: "row",
+    gap: SPACING.space_20,
+    flexWrap: "wrap",
+
+    justifyContent: "center",
+  },
+  genreBox: {
+    alignItems: "center",
+    flexBasis: "45%",
+    borderColor: COLORS.WhiteRGBA50,
+    borderWidth: 1,
+    paddingVertical: SPACING.space_4,
+    paddingHorizontal: SPACING.space_10,
+    borderRadius: BORDERRADIUS.radius_25,
+  },
+  genreText: {
+    fontFamily: FONTFAMILY.poppins_regular,
+    fontSize: FONTSIZE.size_10,
+    color: COLORS.WhiteRGBA75,
   },
 });

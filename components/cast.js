@@ -37,8 +37,8 @@ export default function Cast({ cast, navigation }) {
                   />
                 </View>
                 <Text style={styles.name}>
-                  {person?.name > 14
-                    ? person?.name.slice(0, 14) + "..."
+                  {person?.name.length > 12
+                    ? person?.name.slice(0, 12) + "..."
                     : person?.name}
                 </Text>
                 <Text style={styles.character}>

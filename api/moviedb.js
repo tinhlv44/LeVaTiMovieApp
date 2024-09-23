@@ -8,6 +8,7 @@ const trendingMoviesEndPoint = `${apiBaseUrl}/trending/movie/day?api_key=${apiKe
 const upcomingMoviesEndPoint = `${apiBaseUrl}/movie/upcoming?api_key=${apiKey}`
 const topratedMoviesEndPoint = `${apiBaseUrl}/movie/top_rated?api_key=${apiKey}`
 
+const searchMoviesEndpoint = `${apiBaseUrl}/search/movie?api_key=${apiKey}`
 //dynamic endpoints
 const movieDetailsEndpoint = id =>  `${apiBaseUrl}/movie/${id}?api_key=${apiKey}`
 const movieCreditsEndpoint = id =>  `${apiBaseUrl}/movie/${id}/credits?api_key=${apiKey}`
@@ -15,6 +16,7 @@ const similarMoviesEndpoint = id =>  `${apiBaseUrl}/movie/${id}/similar?api_key=
 
 const personDetailsEndpoint = id =>  `${apiBaseUrl}/person/${id}?api_key=${apiKey}`
 const personMoviesEndpoint = id =>  `${apiBaseUrl}/person/${id}/movie_credits?api_key=${apiKey}`
+
 
 //fallcallImage
 export const fallcallImageMovie = 'https://th.bing.com/th/id/OIP.CXEc0Us30dFcEl8V0uLJEgHaLH?rs=1&pid=ImgDetMain'
@@ -66,4 +68,7 @@ export const fetchPersonDetails = id =>{
 }
 export const fetchPersonMovies = id =>{
     return apiCall(personMoviesEndpoint(id))
+}
+export const fetchSearchMovies = params =>{
+    return apiCall(searchMoviesEndpoint, params)
 }

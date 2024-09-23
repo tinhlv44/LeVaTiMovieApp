@@ -8,27 +8,49 @@ import {
   Image,
   Dimensions,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { Colors } from "../constants/Colors";
 import Loading from "../components/loading";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-
+import { fallcallImageMovie, fetchSearchMovies, img342 } from "../api/moviedb";
+import {debounce} from 'lodash'
 var { width, height } = Dimensions.get("window");
 export default function SearchScreen() {
   const navigation = useNavigation();
-  const [results, setResults] = useState([1, 2, 3, 5, 5]);
-  const [loading, setLoanging] = useState(true);
-  let movieName = "Đây là tên phim ne moi nguoi ai aiaiaiajgsđgdfgdfgaoij";
+  const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const handleSearch = query => {
+    if (query.length > 2 && query ){
+      setLoading(true)
+      fetchSearchMovies({
+        query,
+        include_adult: 'false',
+        // language: 'vi-VN',
+        language: 'en-US',
+        page: '1'
+      }).then(data =>{
+        setLoading(false)
+        if (data && data.results) setResults(data.results)
+      })
+    }
+    else{
+      setLoading(false)
+      setResults([])
+    }
+  };
+  const handleTextDebounce = useCallback(debounce(handleSearch, 400), []) 
   return (
     <SafeAreaView style={styles.safeView}>
       <View style={styles.input}>
         <TextInput
           placeholder="Tìm kiếm"
-          placeholderTextColor={"lightgray"}
+          placeholderTextColor="lightgray"
           style={styles.textInput}
+          onChangeText={handleTextDebounce}
         />
         <TouchableOpacity
           onPress={() => navigation.navigate("Home")}
@@ -56,14 +78,14 @@ export default function SearchScreen() {
                   <View style={styles.result}>
                     <Image
                       source={{
-                        uri: "https://th.bing.com/th/id/OIP.DXi-IO1zd9_je9x1go-HqAHaKk?w=185&h=264&c=7&r=0&o=5&pid=1.7",
+                        uri: img342(item.poster_path) || fallcallImageMovie
                       }}
                       style={styles.image}
                     />
                     <Text style={styles.name}>
-                      {movieName.length > 22
-                        ? movieName.slice(0, 22) + "..."
-                        : movieName}
+                      {item.title.length > 22
+                        ? item.title.slice(0, 22) + "..."
+                        : item.title}
                     </Text>
                   </View>
                 </TouchableOpacity>

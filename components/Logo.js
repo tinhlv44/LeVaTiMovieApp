@@ -1,4 +1,5 @@
 import { StyleSheet, Text} from 'react-native';
+import { Colors } from '../constants/Colors';
 const Logo = () =>{
     return(
         <Text style={styles.logoStyle}>
@@ -26,6 +27,6 @@ const styles = StyleSheet.create({
         fontWeight:"bold",
     },
     logoStyleBold: {
-        color:'green',
+        color:Colors.main,
       },
 })

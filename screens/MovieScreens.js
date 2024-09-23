@@ -22,6 +22,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import Cast from "../components/cast";
 import Loading from "../components/loading";
 import { fallcallImageMovie, fetchMovieCredits, fetchMovieDetails, fetchSimilarMovies, img500 } from "../api/moviedb";
+import { BORDERRADIUS, COLORS, FONTFAMILY, FONTSIZE, SPACING } from "../constants/theme";
 
 var { width, height } = Dimensions.get("window");
 const ios = Platform.OS == "android";
@@ -62,6 +63,7 @@ export default function MovieScreen() {
     <ScrollView
       contentContainerStyle={{ paddingBottom: 20 }}
       style={styles.container}
+      key={item.id}
     >
       {/* Nút trở lại */}
       <SafeAreaView style={styles.viewSafe}>
@@ -132,7 +134,7 @@ export default function MovieScreen() {
             movie?.genres?.map((genne, index) =>{   
               let lastGenne = index+1 != movie.genres.length
               return(
-                <Text style={styles.textDetail}>{genne?.name} {lastGenne && '-'} </Text>
+                <Text key={index} style={styles.textDetail}>{genne?.name} {lastGenne && '-'} </Text>
               )           
             })
           }
@@ -142,6 +144,19 @@ export default function MovieScreen() {
       <Text style={styles.textDescription}>
        {movie?.overview}
       </Text>
+
+      <View>
+          <TouchableOpacity
+            style={styles.buttonBG}
+            onPress={() => {
+              navigation.push('SeatBooking', {
+                BgImage: img500(movie?.backdrop_path) || fallcallImageMovie,
+                PosterImage: img500(movie?.poster_path) || fallcallImageMovie,
+              });
+            }}>
+            <Text style={styles.buttonText}>Select Seats</Text>
+          </TouchableOpacity>
+        </View>
       {/* Diễn viên */}
 
       <Cast navigation={navigation} cast={cast} />
@@ -200,5 +215,19 @@ const styles = StyleSheet.create({
     color: "rgb(163 163 163)",
     letterSpacing: 0.05,
     paddingHorizontal: 16,
+  },
+  // add ts
+  buttonBG: {
+    alignItems: 'center',
+    marginVertical: SPACING.space_24,
+  },
+  buttonText: {
+    borderRadius: BORDERRADIUS.radius_25 * 2,
+    paddingHorizontal: SPACING.space_24,
+    paddingVertical: SPACING.space_10,
+    backgroundColor: COLORS.Orange,
+    fontFamily: FONTFAMILY.poppins_medium,
+    fontSize: FONTSIZE.size_14,
+    color: COLORS.White,
   },
 });
