@@ -7,9 +7,8 @@ var { width, height } = Dimensions.get("window");
 export default function Loading() {
   return (
     <View style={styles.container}>
-        <Progress.CircleSnail thickness={12} size={160} color={
-            //Colors.bgBlack
-            'blue'
+        <Progress.CircleSnail thickness={12} size={90} color={
+            Colors.main
             }/>
     </View>
   )

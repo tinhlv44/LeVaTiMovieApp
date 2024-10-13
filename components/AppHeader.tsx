@@ -1,25 +1,25 @@
 import * as React from 'react';
 import {Text, View, StyleSheet, TouchableOpacity} from 'react-native';
-//import CustomIcon from './CustomIcon';
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {
   BORDERRADIUS,
-  COLORS,
+  Colors,
   FONTFAMILY,
   FONTSIZE,
   SPACING,
-} from '../constants/theme';
+} from '../constants/Colors';
 import CustomIcon from './CustomIcon';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const AppHeader = (props: any) => {
   return (
-    <View style={styles.container}>
-      <TouchableOpacity style={styles.iconBG} onPress={() => props.action()}>
+    <SafeAreaView style={styles.container}>
+      {/* <TouchableOpacity style={styles.iconBG} onPress={() => props.action()}>
         <CustomIcon name={props.name} style={styles.iconStyle} />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
       <Text style={styles.headerText}>{props.header}</Text>
-      <View style={styles.emptyContainer}></View>
-    </View>
+      {/* <View style={styles.emptyContainer}></View> */}
+    </SafeAreaView>
   );
 };
 
@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   iconStyle: {
-    color: COLORS.White,
+    color: Colors.bgLight,
     fontSize: FONTSIZE.size_24,
   },
   headerText: {
@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
     fontFamily: FONTFAMILY.poppins_medium,
     fontSize: FONTSIZE.size_20,
     textAlign: 'center',
-    color: COLORS.White,
+    color: Colors.bgLight,
   },
   emptyContainer: {
     height: SPACING.space_20 * 2,
@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: BORDERRADIUS.radius_20,
-    backgroundColor: COLORS.Orange,
+    backgroundColor: Colors.main,
   },
 });
 

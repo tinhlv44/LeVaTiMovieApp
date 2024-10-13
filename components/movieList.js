@@ -15,14 +15,14 @@ import { Colors } from "../constants/Colors";
 
 var { width, height } = Dimensions.get("window");
 
-export default function MovieList({ title, data, hideSeeAll }) {
+export default function MovieList({ title, data, hideSeeAll, onPress }) {
   const navigation = useNavigation();
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.text}>{title}</Text>
         {!hideSeeAll && (
-          <TouchableOpacity>
+          <TouchableOpacity onPress={onPress}>
             <Text style={[styles.text, {color: Colors.textn300}]}>Xem tất cả</Text>
           </TouchableOpacity>
         )}
@@ -33,6 +33,7 @@ export default function MovieList({ title, data, hideSeeAll }) {
         contentContainerStyle={{ paddingHorizontal: 8 }}
       >
         {data.map((item, index) => {
+          if (!item.poster_path) return
           return (
             <TouchableNativeFeedback
               key={index}

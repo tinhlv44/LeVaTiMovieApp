@@ -21,7 +21,7 @@ var { width, height } = Dimensions.get("window");
 export default function SearchScreen() {
   const navigation = useNavigation();
   const [results, setResults] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const handleSearch = query => {
     if (query.length > 2 && query ){

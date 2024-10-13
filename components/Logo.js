@@ -1,8 +1,8 @@
 import { StyleSheet, Text} from 'react-native';
 import { Colors } from '../constants/Colors';
-const Logo = () =>{
+const Logo = ({size}) =>{
     return(
-        <Text style={styles.logoStyle}>
+        <Text style={[styles.logoStyle, {fontSize: size?size:24}]}>
             {/* <Text style={styles.logoStyleBold}>
                 L
             </Text>e

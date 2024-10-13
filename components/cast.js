@@ -21,6 +21,7 @@ export default function Cast({ cast, navigation }) {
       >
         {cast &&
           cast.map((person, index) => {
+            if (!person?.profile_path) return
             return (
               <TouchableOpacity
                 key={index}

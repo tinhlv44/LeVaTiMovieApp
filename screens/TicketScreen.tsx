@@ -1,158 +1,147 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Text,
   View,
   StyleSheet,
   StatusBar,
   ImageBackground,
-  Image,
+  ActivityIndicator,
+  TouchableOpacity,
+  ScrollView,
 } from 'react-native';
-//import EncryptedStorage from 'react-native-encrypted-storage';
 import AppHeader from '../components/AppHeader';
-import {
-  BORDERRADIUS,
-  COLORS,
-  FONTFAMILY,
-  FONTSIZE,
-  SPACING,
-} from '../constants/theme';
-// import LinearGradient from 'react-native-linear-gradient';
+import { BORDERRADIUS, COLORS, FONTFAMILY, FONTSIZE, SPACING } from '../constants/theme';
 import CustomIcon from '../components/CustomIcon';
+import QRCode from 'react-native-qrcode-svg'; // Import thư viện QR Code
 import { LinearGradient } from 'expo-linear-gradient';
+import { collection, getDocs, query, where } from 'firebase/firestore';
+import { db } from '../firebaseConfig';
+import { img500 } from '../api/moviedb';
 
-const TicketScreen = ({navigation, route}: any) => {
-  const [ticketData, setTicketData] = useState<any>(route.params);
+const TicketScreen = ({ navigation, route }) => {
+  const [ticketData, setTicketData] = useState(route.params?.ticketData || {});
+  const [movie, setMovie] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    (async () => {
+    const fetchMovie = async () => {
       try {
-        //const ticket = await EncryptedStorage.getItem('ticket');
-        // if (ticket !== undefined && ticket !== null) {
-        //   setTicketData(JSON.parse(ticket));
-        // }
+        const movieId = ticketData?.movieId;
+        if (movieId) {
+          const moviesRef = collection(db, 'movies');
+          const q = query(moviesRef, where('id', '==', movieId));
+          const querySnapshot = await getDocs(q);
+  
+          if (!querySnapshot.empty) {
+            querySnapshot.forEach((doc) => {
+              const movieData = doc.data();
+              setMovie(movieData);
+            });
+          } else {
+            console.error("No movie found with the given idmovie");
+          }
+        } else {
+          console.error("idmovie is missing from ticketData");
+        }
       } catch (error) {
-        console.error('Something went wrong while getting Data', error);
+        console.error('Error fetching movie data:', error);
+      } finally {
+        setLoading(false);
       }
-    })();
-  }, []);
+    };
 
-  if (ticketData !== route.params && route.params != undefined) {
-    setTicketData(route.params);
-  }
+    fetchMovie();
+  }, [ticketData]);
 
-  if (ticketData == undefined || ticketData == null) {
+  if (!ticketData || loading) {
     return (
-      <View style={styles.container}>
-        <StatusBar hidden />
-        <View style={styles.appHeaderContainer}>
-          <AppHeader
-            name="close"
-            header={'My Tickets'}
-            action={() => navigation.goBack()}
-          />
-        </View>
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={COLORS.Orange} />
       </View>
     );
   }
-  return (
-    <View style={styles.container}>
-      <StatusBar hidden />
-      <View style={styles.appHeaderContainer}>
-        <AppHeader
-          name="close"
-          header={'My Tickets'}
-          action={() => navigation.goBack()}
-        />
-      </View>
 
+  return (
+    <ScrollView>
+
+    <View style={styles.container}>
       <View style={styles.ticketContainer}>
         <ImageBackground
-          source={{uri: ticketData?.ticketImage}}
-          style={styles.ticketBGImage}>
-          <LinearGradient
-            colors={[COLORS.OrangeRGBA0, COLORS.Orange]}
-            style={styles.linearGradient}>
-            <View
-              style={[
-                styles.blackCircle,
-                {position: 'absolute', bottom: -40, left: -40},
-              ]}></View>
-            <View
-              style={[
-                styles.blackCircle,
-                {position: 'absolute', bottom: -40, right: -40},
-              ]}></View>
+          source={{ uri: img500(movie.poster_path ) }}
+          style={styles.ticketBGImage}
+        >
+          <LinearGradient colors={[COLORS.OrangeRGBA0, COLORS.Orange]} style={styles.linearGradient}>
+            <View style={[styles.blackCircle, { position: 'absolute', bottom: -40, left: -40 }]}></View>
+            <View style={[styles.blackCircle, { position: 'absolute', bottom: -40, right: -40 }]}></View>
           </LinearGradient>
         </ImageBackground>
+
         <View style={styles.linear}></View>
 
         <View style={styles.ticketFooter}>
-          <View
-            style={[
-              styles.blackCircle,
-              {position: 'absolute', top: -40, left: -40},
-            ]}></View>
-          <View
-            style={[
-              styles.blackCircle,
-              {position: 'absolute', top: -40, right: -40},
-            ]}></View>
+          <View style={[styles.blackCircle, { position: 'absolute', top: -40, left: -40 }]}></View>
+          <View style={[styles.blackCircle, { position: 'absolute', top: -40, right: -40 }]}></View>
+
           <View style={styles.ticketDateContainer}>
             <View style={styles.subtitleContainer}>
-              <Text style={styles.dateTitle}>{ticketData?.date.date}</Text>
-              <Text style={styles.subtitle}>{ticketData?.date.day}</Text>
+              <Text style={styles.dateTitle}>{ticketData?.date}</Text>
+              <Text style={styles.subtitle}>{ticketData?.day}</Text>
             </View>
-            <View style={styles.subtitleContainer}>
-              <CustomIcon name="clock" style={styles.clockIcon} />
+            <View style={[styles.subtitleContainer, { flexDirection: 'row' }]}>
+              <CustomIcon name="clock" style={styles.clockIcon} type='Feather' />
               <Text style={styles.subtitle}>{ticketData?.time}</Text>
             </View>
           </View>
+          <Text style={styles.text}>{movie.title}</Text>
           <View style={styles.ticketSeatContainer}>
             <View style={styles.subtitleContainer}>
               <Text style={styles.subheading}>Hall</Text>
-              <Text style={styles.subtitle}>02</Text>
-            </View>
-            <View style={styles.subtitleContainer}>
-              <Text style={styles.subheading}>Row</Text>
-              <Text style={styles.subtitle}>04</Text>
+              <Text style={styles.subtitle}>{ticketData?.cinemaId}</Text>
             </View>
             <View style={styles.subtitleContainer}>
               <Text style={styles.subheading}>Seats</Text>
               <Text style={styles.subtitle}>
-                {ticketData?.seatArray
-                  .slice(0, 3)
-                  .map((item: any, index: number, arr: any) => {
-                    return item + (index == arr.length - 1 ? '' : ', ');
-                  })}
+                {ticketData?.seats.join(', ')}
               </Text>
             </View>
           </View>
-          <Image
-            source={require('../assets/image/barcode.png')}
-            style={styles.barcodeImage}
+
+          {/* Hiển thị mã QR */}
+          <QRCode
+            value={`Movie: ${ticketData?.movieId}, Seats: ${ticketData?.seats.join(', ')}, State: ${ticketData?.state}`}
+            size={150} // Kích thước mã QR
+            color="black"
+            backgroundColor="white"
           />
+
+          <TouchableOpacity style={styles.shareButton}>
+            <CustomIcon name="payment" style={styles.shareIcon} />
+            <Text style={styles.shareText}>Payment</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    display: 'flex',
     flex: 1,
     backgroundColor: COLORS.Black,
   },
-  appHeaderContainer: {
-    marginHorizontal: SPACING.space_36,
-    marginTop: SPACING.space_20 * 2,
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: COLORS.Black,
   },
   ticketContainer: {
     flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
   },
   ticketBGImage: {
-    alignSelf: 'center',
     width: 300,
     aspectRatio: 200 / 300,
     borderTopLeftRadius: BORDERRADIUS.radius_25,
@@ -161,13 +150,12 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   linearGradient: {
-    height: '70%',
+    height: '50%',
   },
   linear: {
     borderTopColor: COLORS.Black,
     borderTopWidth: 3,
     width: 300,
-    alignSelf: 'center',
     backgroundColor: COLORS.Orange,
     borderStyle: 'dashed',
   },
@@ -176,56 +164,79 @@ const styles = StyleSheet.create({
     width: 300,
     alignItems: 'center',
     paddingBottom: SPACING.space_36,
-    alignSelf: 'center',
     borderBottomLeftRadius: BORDERRADIUS.radius_25,
     borderBottomRightRadius: BORDERRADIUS.radius_25,
+    paddingTop: SPACING.space_20,
   },
   ticketDateContainer: {
     flexDirection: 'row',
     gap: SPACING.space_36,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-evenly',
     marginVertical: SPACING.space_10,
   },
   ticketSeatContainer: {
     flexDirection: 'row',
-    gap: SPACING.space_36,
+    width: '70%',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     marginVertical: SPACING.space_10,
   },
   dateTitle: {
     fontFamily: FONTFAMILY.poppins_medium,
     fontSize: FONTSIZE.size_24,
     color: COLORS.White,
+    textAlign: 'center',
   },
   subtitle: {
     fontFamily: FONTFAMILY.poppins_regular,
     fontSize: FONTSIZE.size_14,
     color: COLORS.White,
+    textAlign: 'center',
   },
   subheading: {
     fontFamily: FONTFAMILY.poppins_medium,
     fontSize: FONTSIZE.size_18,
     color: COLORS.White,
+    textAlign: 'center',
   },
   subtitleContainer: {
     alignItems: 'center',
+    justifyContent: 'center',
   },
   clockIcon: {
     fontSize: FONTSIZE.size_24,
     color: COLORS.White,
-    paddingBottom: SPACING.space_10,
-  },
-  barcodeImage: {
-    height: 50,
-    aspectRatio: 158 / 52,
+    paddingRight: SPACING.space_8,
   },
   blackCircle: {
     height: 80,
     width: 80,
-    borderRadius: 80,
     backgroundColor: COLORS.Black,
+    borderRadius: 40,
+  },
+  shareButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.White,
+    borderRadius: BORDERRADIUS.radius_25,
+    padding: SPACING.space_10,
+    marginTop: SPACING.space_20,
+  },
+  shareIcon: {
+    fontSize: FONTSIZE.size_18,
+    color: COLORS.Black,
+    marginRight: SPACING.space_8,
+  },
+  shareText: {
+    fontFamily: FONTFAMILY.poppins_medium,
+    fontSize: FONTSIZE.size_16,
+    color: COLORS.Black,
+  },
+  text: {
+    color: "white",
+    fontSize: 20,
+    fontWeight: "bold",
   },
 });
 

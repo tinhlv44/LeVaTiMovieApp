@@ -9,9 +9,9 @@ import {
   Platform,
   Dimensions,
   Image,
+  ToastAndroid,
 } from "react-native";
-import {SafeAreaView} from 'react-native-safe-area-context';
-//import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { SafeAreaView } from "react-native-safe-area-context";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { Colors } from "../constants/Colors";
 import MovieList from "../components/movieList";
@@ -21,61 +21,74 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import { LinearGradient } from "expo-linear-gradient";
 import Cast from "../components/cast";
 import Loading from "../components/loading";
-import { fallcallImageMovie, fetchMovieCredits, fetchMovieDetails, fetchSimilarMovies, img500 } from "../api/moviedb";
-import { BORDERRADIUS, COLORS, FONTFAMILY, FONTSIZE, SPACING } from "../constants/theme";
+import {
+  fallcallImageMovie,
+  fetchMovieCredits,
+  fetchMovieDetails,
+  fetchSimilarMovies,
+  img500,
+} from "../api/moviedb";
+import {
+  BORDERRADIUS,
+  COLORS,
+  FONTFAMILY,
+  FONTSIZE,
+  SPACING,
+} from "../constants/theme";
+import { db } from "../firebaseConfig"; // Import Firestore from your config
+import {
+  collection,
+  addDoc,
+  getDocs,
+  setDoc,
+  updateDoc,
+  doc,
+  arrayUnion,
+  getDoc,
+  arrayRemove,
+} from "firebase/firestore"; // Import Firestore methods
+import { useMyContextController } from "../store";
 
 var { width, height } = Dimensions.get("window");
-const ios = Platform.OS == "android";
+const ios = Platform.OS === "android";
 const topMargin = ios ? 36 : 0;
 
 export default function MovieScreen() {
   const navigation = useNavigation();
-  const { params: item } = useRoute();
+  const { params } = useRoute();
   const [movie, setMovie] = useState(false);
   const [isFavourite, setIsFavourite] = useState(false);
   const [cast, setCast] = useState([]);
   const [similarMovie, setSimilarMovie] = useState([]);
-  const [loading, setLoanging] = useState(true);
-  useEffect(() => {
-    //Lấy api chi tiết phim
-    setLoanging(true);
-    getMoviesDetails(item.id);
-    getMovieCredits(item.id);
-    getSimilarMovies(item.id);
-  }, [item]);
-  const getMoviesDetails = async id => {
-    const data = await fetchMovieDetails(id);
-    if (data) setMovie(data);
-    setLoanging(false);
-  };
+  const [loading, setLoading] = useState(true);
+  const [id, setId] = useState(null);
 
-  const getMovieCredits = async id => {
-    const data = await fetchMovieCredits(id);
-    if (data && data.cast) setCast(data.cast);
-    setLoanging(false);
-  };
-  const getSimilarMovies = async id => {
-    const data = await fetchSimilarMovies(id);
-    if (data && data.results) setSimilarMovie(data.results);
-    setLoanging(false);
-  };
-  return (
-    <ScrollView
-      contentContainerStyle={{ paddingBottom: 20 }}
-      style={styles.container}
-      key={item.id}
-    >
-      {/* Nút trở lại */}
-      <SafeAreaView style={styles.viewSafe}>
+  const [controller, dispatch] = useMyContextController();
+  const { uid } = controller;
+  useEffect(() => {
+    checkFavoriteStatus();
+  }, [controller]);
+  useEffect(() => {
+    checkFavoriteStatus();
+  }, []);
+  useEffect(() => {
+    navigation.setOptions({
+      headerTitle: movie.title || "Movie Details",
+      headerShown: true,
+      headerTransparent: true,
+      headerTintColor: "#fff",
+      headerLeft: () => (
         <TouchableOpacity
           style={styles.btnBack}
           onPress={() => navigation.goBack()}
         >
           <Ionicons name="arrow-back" size={28} color="white" />
         </TouchableOpacity>
+      ),
+      headerRight: () => (
         <TouchableOpacity
           style={styles.btnBack}
-          onPress={() => setIsFavourite(!isFavourite)}
+          onPress={async () => await handleFavorite()}
         >
           <AntDesign
             name="heart"
@@ -83,89 +96,248 @@ export default function MovieScreen() {
             color={isFavourite ? Colors.heart : "white"}
           />
         </TouchableOpacity>
-      </SafeAreaView>
+      ),
+    });
+  }, [movie, isFavourite]);
+
+  useEffect(() => {
+    setLoading(true);
+
+    // Kiểm tra xem params.item có phải là một đối tượng hay không
+    if (params.item) {
+      // Nếu có item, sử dụng trực tiếp
+      setId(params.id);
+      setMovie(params.item);
+      getMovieCredits(params.id);
+      getSimilarMovies(params.id);
+    } else if (params.id) {
+      // Nếu chỉ có id, fetch dữ liệu từ Firestore
+      setId(params.id);
+      getMoviesDetails(params.id);
+      getMovieCredits(params.id);
+      getSimilarMovies(params.id);
+    }
+  }, [params]);
+  const getMoviesDetails = async (id) => {
+    const data = await fetchMovieDetails(id);
+    if (data) {
+      setMovie(data);
+      //saveMovieToFirestore(data); // Save movie to Firestore
+    }
+    setLoading(false);
+  };
+
+  const getMovieCredits = async (id) => {
+    const data = await fetchMovieCredits(id);
+    if (data && data.cast) setCast(data.cast);
+    setLoading(false);
+  };
+
+  const getSimilarMovies = async (id) => {
+    const data = await fetchSimilarMovies(id);
+    if (data && data.results) setSimilarMovie(data.results);
+    setLoading(false);
+  };
+
+  // Function to save movie to Firestore
+  const saveMovieToFirestore = async (movieData) => {
+    try {
+      if (!movieData.adult) {
+        // Filter out adult movies
+        const movieCollection = collection(db, "movies");
+        const movieExists = await checkMovieExists(movieData.id);
+
+        if (!movieExists) {
+          await addDoc(movieCollection, {
+            id: movieData.id,
+            title: movieData.title,
+            overview: movieData.overview,
+            release_date: movieData.release_date,
+            genres: movieData.genres.map((g) => g.name),
+            poster_path: movieData.poster_path,
+            backdrop_path: movieData.backdrop_path,
+            runtime: movieData.runtime,
+            status: movieData.status,
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error adding movie to Firestore:", error);
+    }
+  };
+
+  // Function to check if movie already exists in Firestore
+  const checkMovieExists = async (movieId) => {
+    const movieCollection = collection(db, "movies");
+    const querySnapshot = await getDocs(movieCollection);
+    return querySnapshot.docs.some((doc) => doc.data().id === movieId);
+  };
+
+  const checkIsFav = async () => {
+    try {
+      const docRef = doc(db, "favorites", uid);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        const movies = docSnap.data().movies || [];
+        return movies.includes(id); // Trả về true nếu movieId đã có trong danh sách yêu thích
+      }
+
+      return false; // Trả về false nếu không có dữ liệu yêu thích
+    } catch (e) {
+      console.log("Error checking favorite status: ", e);
+      return false; // Trả về false trong trường hợp lỗi
+    }
+  };
+  const checkFavoriteStatus = async () => {
+    if (!uid) return;
+    const isFav = await checkIsFav(); // Gọi hàm checkIsFav để kiểm tra
+    setIsFavourite(isFav); // Cập nhật trạng thái yêu thích
+  };
+
+  // Hàm xử lý yêu thích (đã có từ trước)
+  const handleFavorite = async () => {
+    try {
+      if (!uid) {
+        ToastAndroid.show("Please Login", ToastAndroid.LONG);
+        return;
+      }
+
+      setIsFavourite(!isFavourite);
+
+      // Tham chiếu đến tài liệu dựa trên uid
+      const docRef = doc(db, "favorites", uid);
+
+      // Lấy tài liệu để kiểm tra xem có tồn tại mảng movies hay không
+      const docSnap = await getDoc(docRef);
+
+      // Tạo tài liệu với mảng movies nếu không tồn tại
+      if (!docSnap.exists()) {
+        await setDoc(docRef, { movies: [] });
+      }
+
+      if (isFavourite) {
+        // Nếu đã yêu thích, thì xoá
+        await updateDoc(docRef, {
+          movies: arrayRemove(id), // Xoá movieId khỏi mảng
+        });
+        ToastAndroid.show("Movie removed from favorites", ToastAndroid.LONG);
+      } else {
+        // Nếu chưa yêu thích, thì thêm
+        await updateDoc(docRef, {
+          movies: arrayUnion(id), // Thêm movieId vào mảng
+        });
+        ToastAndroid.show("Movie added to favorites", ToastAndroid.LONG);
+      }
+    } catch (e) {
+      ToastAndroid.show(
+        "Error adding movie to favorites: " + e.message,
+        ToastAndroid.LONG
+      );
+      console.log("Error adding movie to favorites: ", e);
+    }
+  };
+
+  return (
+    <ScrollView
+      contentContainerStyle={{ paddingBottom: 20 }}
+      style={styles.container}
+      key={id}
+    >
       <View style={styles.header}>
         {loading ? (
           <Loading />
         ) : (
-          <View>
+          <View style={{ position: "relative" }}>
+            {/* Image */}
             <Image
               source={{
-                // uri: "https://th.bing.com/th/id/OIP.DXi-IO1zd9_je9x1go-HqAHaKk?w=185&h=264&c=7&r=0&o=5&pid=1.7",
-                uri: img500(movie?.poster_path) || fallcallImageMovie
+                uri: img500(movie?.poster_path) || fallcallImageMovie,
               }}
               style={{
                 width,
-                height: height * 0.4,
+                height: height * 0.54,
               }}
             />
+
+            {/* Top Gradient Overlay */}
             <LinearGradient
               colors={[
-                "transparent",
-                "rgba(48, 48, 48, 0.8)",
-                "rgba(48, 48, 48, 1)",
+                "rgba(48, 48, 48, 0.5)", // Solid color on top
+                "transparent", // Fades to transparent
               ]}
-              style={{
-                width: width,
-                height: height * 0.3,
-                position: "absolute",
-                bottom: 0,
-              }}
-              start={{ x: 0.5, y: 0 }}
-              end={{ x: 0.5, y: 1 }}
+              style={styles.gradientTop}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 0, y: 1 }}
+            />
+
+            {/* Bottom Gradient Overlay */}
+            <LinearGradient
+              colors={[
+                "transparent", // Transparent at the top
+                "rgba(26, 26, 29, 1)", // Solid color at the bottom
+              ]}
+              style={styles.gradient}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 0, y: 1 }}
             />
           </View>
         )}
       </View>
-      {/* Chi tiết phim */}
-      <View>
-        {/* Ten phim */}
-        <Text style={styles.name}>{movie?.title}</Text>
-        {/* Ngày phát hành - trang thái - thời gian chiếu */}
-        {
-          movie?.id ? (
-            <Text style={styles.textDetail}>
-              {movie?.status} - {movie?.release_date.split('-')[0]} - {movie?.runtime} min
-            </Text>
-          ) : (null)
-        }
-        <View style={styles.genres}>
-          {
-            movie?.genres?.map((genne, index) =>{   
-              let lastGenne = index+1 != movie.genres.length
-              return(
-                <Text key={index} style={styles.textDetail}>{genne?.name} {lastGenne && '-'} </Text>
-              )           
-            })
-          }
-        </View>
-      </View>
-      {/* Mô tả phim */}
-      <Text style={styles.textDescription}>
-       {movie?.overview}
-      </Text>
 
-      <View>
-          <TouchableOpacity
-            style={styles.buttonBG}
-            onPress={() => {
-              navigation.push('SeatBooking', {
+      <View style={styles.detailsContainer}>
+        {/* Movie title */}
+        <Text style={styles.name}>{movie?.title}</Text>
+        {/* Release date, status, runtime */}
+        {movie?.id && (
+          <Text style={styles.textDetail}>
+            {movie?.status} - {movie?.release_date.split("-")[0]} -{" "}
+            {movie?.runtime} min
+          </Text>
+        )}
+        <View style={styles.genres}>
+          {movie?.genres?.map((genne, index) => {
+            let lastGenne = index + 1 !== movie.genres.length;
+            return (
+              <Text key={index} style={styles.textDetail}>
+                {genne?.name} {lastGenne && "-"}
+              </Text>
+            );
+          })}
+        </View>
+        {/* Movie description */}
+        <Text style={styles.textDescription}>{movie?.overview}</Text>
+
+        <TouchableOpacity
+          style={styles.buttonBG}
+          onPress={() => {
+            //console.log(uid)
+            if (uid === null) {
+              navigation.navigate("Login");
+            } else {
+              navigation.push("SeatBooking", {
                 BgImage: img500(movie?.backdrop_path) || fallcallImageMovie,
                 PosterImage: img500(movie?.poster_path) || fallcallImageMovie,
+                id: movie?.id,
+                title: movie?.title,
               });
-            }}>
-            <Text style={styles.buttonText}>Select Seats</Text>
-          </TouchableOpacity>
-        </View>
-      {/* Diễn viên */}
+            }
+          }}
+        >
+          <Text style={styles.buttonText}>Booking Movie</Text>
+        </TouchableOpacity>
+      </View>
 
+      {/* Cast */}
       <Cast navigation={navigation} cast={cast} />
-      {/* Phim tương tự */}
-      {
-        similarMovie.length > 0 && (
-          <MovieList title="Phim liên quan" hideSeeAll={true} data={similarMovie}/>
-        )
-      }
+      {/* Similar movies */}
+      {similarMovie.length > 0 && (
+        <MovieList
+          title="Related Movies"
+          hideSeeAll={true}
+          data={similarMovie}
+        />
+      )}
     </ScrollView>
   );
 }
@@ -175,34 +347,42 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.bgBlack,
   },
-  viewSafe: {
-    position: "absolute",
-    zIndex: 20,
-    width: "100%",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 16,
-  },
   header: {
     width: "100%",
   },
+  gradient: {
+    width: "100%",
+    height: height * 0.3,
+    position: "absolute",
+    bottom: 0,
+  },
+  gradientTop: {
+    width: "100%",
+    height: height * 0.2,
+    position: "absolute",
+    top: 0,
+  },
+  detailsContainer: {
+    paddingHorizontal: 16,
+    paddingVertical: 24,
+    backgroundColor: Colors.bgBlack,
+  },
   btnBack: {
-    padding: 1,
+    padding: 8,
   },
   name: {
     color: "white",
     textAlign: "center",
     fontWeight: "bold",
-    fontSize: 30,
+    fontSize: 28,
     lineHeight: 36,
     letterSpacing: 0.05,
+    marginBottom: SPACING.space_8,
   },
   genres: {
     flexDirection: "row",
     justifyContent: "center",
-    marginHorizontal: 4,
-    paddingHorizontal: 2,
+    marginVertical: SPACING.space_4,
   },
   textDetail: {
     color: "rgb(163 163 163)",
@@ -214,11 +394,11 @@ const styles = StyleSheet.create({
   textDescription: {
     color: "rgb(163 163 163)",
     letterSpacing: 0.05,
-    paddingHorizontal: 16,
+    marginVertical: SPACING.space_16,
+    textAlign: "justify",
   },
-  // add ts
   buttonBG: {
-    alignItems: 'center',
+    alignItems: "center",
     marginVertical: SPACING.space_24,
   },
   buttonText: {

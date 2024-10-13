@@ -118,7 +118,8 @@ const MovieCard = ({ item, handleClick }) => {
           </Text>
 
           <View style={styles.genreContainer}>
-            {item.genre_ids.map((items) => {
+            {item.genre_ids.map((items, index) => {
+              if (index >3 ) return 
               return (
                 <View key={items} style={styles.genreBox}>
                   <Text style={styles.genreText}>{genres[items]}</Text>

@@ -1,5 +1,5 @@
-// CustomIcon.tsx
 import React from "react";
+import { View, Text, StyleSheet } from "react-native";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
@@ -8,9 +8,7 @@ import Feather from "@expo/vector-icons/Feather";
 import Entypo from "@expo/vector-icons/Entypo";
 import AntDesign from '@expo/vector-icons/AntDesign';
 import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
-// Import thêm các icon khác nếu cần
 
-// Định nghĩa type với các giá trị gợi ý cho `type`
 type IconType =
   | "MaterialIcons"
   | "FontAwesome"
@@ -22,12 +20,14 @@ type IconType =
   | "SimpleLineIcons";
 
 interface CustomIconProps {
-  type?: IconType; // Chỉ có thể chọn các giá trị trong IconType
+  type?: IconType;
   name: string;
   size?: number;
   color?: string;
   style?: object;
+  styleText?: object;
   onPress?: () => void;
+  onText?: string; // Thay đổi từ `ontext` thành `onText` để dễ đọc hơn
 }
 
 const CustomIcon: React.FC<CustomIconProps> = ({
@@ -37,6 +37,8 @@ const CustomIcon: React.FC<CustomIconProps> = ({
   color = "black",
   style,
   onPress,
+  onText,
+  styleText
 }) => {
   let IconComponent;
 
@@ -72,23 +74,38 @@ const CustomIcon: React.FC<CustomIconProps> = ({
   }
 
   return (
-    <IconComponent
-      //   name={name}
-      name={type === 'MaterialCommunityIcons'
-      || type === 'Entypo'
-      || type === 'FontAwesome'
-      || type === 'MaterialIcons'
-      || type === 'Feather'
-      || type === 'Ionicons'
-      || type === 'AntDesign'
-      || type === 'SimpleLineIcons'
-      ? name : 'search'}
-      size={size}
-      color={color}
-      style={style}
-      onPress={onPress}
-    />
+    <View style={styles.container}>
+      <IconComponent
+        name={name}
+        size={size}
+        color={color}
+        style={style}
+        onPress={onPress}
+      />
+      {onText && ( // Kiểm tra xem có text hay không
+        <View style={styles.textContainer}>
+          <Text style={[styles.text, styleText]}>{onText}</Text>
+        </View>
+      )}
+    </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    position: 'relative', // Để badge có thể đặt ở vị trí tuyệt đối
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  textContainer: {
+    position: 'absolute',
+    top:5
+  },
+  text: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 10,
+  },
+});
 
 export default CustomIcon;

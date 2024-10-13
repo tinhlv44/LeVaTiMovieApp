@@ -3,13 +3,13 @@ import HomeScreen from '../screens/HomeScreens';
 import SearchScreen from '../screens/SearchScreen';
 import TicketScreen from '../screens/TicketScreen';
 import UserAccountScreen from '../screens/UserAccountScreen';
-import {COLORS, FONTSIZE, SPACING} from '../constants/theme';
 import CustomIcon from '../components/CustomIcon';
 import {View, StyleSheet} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import StackComponent from './HomeNavigator';
-import { Colors } from '../constants/Colors';
- './HomeNavigator';
+import { Colors, FONTSIZE, SPACING } from '../constants/Colors';
+import BookingsScreen from '../screens/BookingsScreen ';
+import ShowtimeScreen from '../screens/ShowtimeScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -20,7 +20,7 @@ const TabNavigator = () => {
         tabBarHideOnKeyboard: true,
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: COLORS.Black,
+          backgroundColor: Colors.bgBlack2,
           borderTopWidth: 0,
           height: 6 * 10,
           
@@ -36,11 +36,11 @@ const TabNavigator = () => {
               <View
                 style={[
                   styles.activeTabBackground,
-                  focused ? {backgroundColor: COLORS.Orange} : {},
+                  focused ? {backgroundColor: Colors.main} : {},
                 ]}>
                 <CustomIcon
                   name="video-vintage"
-                  color={COLORS.White}
+                  color={Colors.bgLight}
                   size={FONTSIZE.size_30}
                   type='MaterialCommunityIcons'
                 />
@@ -50,6 +50,29 @@ const TabNavigator = () => {
         }}
       />
       <Tab.Screen
+        name="Showtime"
+        component={ShowtimeScreen}
+        options={{
+          tabBarShowLabel: false,
+          tabBarIcon: ({focused, color, size}) => {
+            return (
+              <View
+                style={[
+                  styles.activeTabBackground,
+                  focused ? {backgroundColor: Colors.main} : {},
+                ]}>
+                <CustomIcon
+                  name="calendar-times-o"
+                  color={Colors.bgLight}
+                  size={FONTSIZE.size_30}
+                  type='FontAwesome'
+                />
+              </View>
+            );
+          },
+        }}
+      />
+      {/* <Tab.Screen
         name="Search"
         component={SearchScreen}
         options={{
@@ -59,21 +82,22 @@ const TabNavigator = () => {
               <View
                 style={[
                   styles.activeTabBackground,
-                  focused ? {backgroundColor: COLORS.Orange} : {},
+                  focused ? {backgroundColor: Colors.main} : {},
                 ]}>
                 <CustomIcon
                   name="search"
-                  color={COLORS.White}
+                  color={Colors.bgLight}
                   size={FONTSIZE.size_30}
                 />
               </View>
             );
           },
         }}
-      />
+      /> */}
       <Tab.Screen
         name="Ticket"
-        component={TicketScreen}
+        //component={TicketScreen}
+        component={BookingsScreen}
         options={{
           tabBarShowLabel: false,
           tabBarIcon: ({focused, color, size}) => {
@@ -81,11 +105,11 @@ const TabNavigator = () => {
               <View
                 style={[
                   styles.activeTabBackground,
-                  focused ? {backgroundColor: COLORS.Orange} : {},
+                  focused ? {backgroundColor: Colors.main} : {},
                 ]}>
                 <CustomIcon
                   name="ticket"
-                  color={COLORS.White}
+                  color={Colors.bgLight}
                   size={FONTSIZE.size_30}
                   type='Ionicons'
                 />
@@ -104,11 +128,11 @@ const TabNavigator = () => {
               <View
                 style={[
                   styles.activeTabBackground,
-                  focused ? {backgroundColor: COLORS.Orange} : {},
+                  focused ? {backgroundColor: Colors.main} : {},
                 ]}>
                 <CustomIcon
                   name="user"
-                  color={COLORS.White}
+                  color={Colors.bgLight}
                   size={FONTSIZE.size_30}
                   type='AntDesign'
                 />
@@ -123,7 +147,7 @@ const TabNavigator = () => {
 
 const styles = StyleSheet.create({
   activeTabBackground: {
-    backgroundColor: COLORS.Black,
+    backgroundColor: Colors.bgBlack,
     padding: SPACING.space_12,
     borderRadius: SPACING.space_18 * 10,
   },
