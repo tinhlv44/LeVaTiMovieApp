@@ -11,16 +11,17 @@ import {
 import React from "react";
 import { useNavigation } from "@react-navigation/native";
 import { fallcallImageMovie, img185 } from "../api/moviedb";
-import { Colors } from "../constants/Colors";
+import { Colors, useThemeColors } from "../constants/Colors";
 
 var { width, height } = Dimensions.get("window");
 
 export default function MovieList({ title, data, hideSeeAll, onPress }) {
   const navigation = useNavigation();
+  const colors = useThemeColors(); // Lấy màu dựa trên darkMode
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.text}>{title}</Text>
+        <Text style={[styles.text, {color: colors.white}]}>{title}</Text>
         {!hideSeeAll && (
           <TouchableOpacity onPress={onPress}>
             <Text style={[styles.text, {color: Colors.textn300}]}>Xem tất cả</Text>
@@ -43,14 +44,13 @@ export default function MovieList({ title, data, hideSeeAll, onPress }) {
                 <Image
                   source={{
                     uri: img185(item.poster_path) || fallcallImageMovie
-                    // uri: "https://th.bing.com/th/id/OIP.DXi-IO1zd9_je9x1go-HqAHaKk?w=185&h=264&c=7&r=0&o=5&pid=1.7",
                   }}
                   style={[
                     styles.image,
                     { width: width * 0.33, height: height * 0.22 },
                   ]}
                 />
-                <Text style={styles.title}>
+                <Text style={[styles.title, {color:colors.white}]}>
                   {item.title.length > 14
                     ? item.title.slice(0, 14) + "..."
                     : item.title}
@@ -82,12 +82,11 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 20,
     lineHeight: 28,
-    color: "white",
+    fontWeight: '600'
   },
   image: {
     borderRadius: 25,
   },
   title:{
-    color: Colors.white
   }
 });

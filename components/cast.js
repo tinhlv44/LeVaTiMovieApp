@@ -8,12 +8,13 @@ import {
 } from "react-native";
 import React from "react";
 import { fallcallImageCast, img185, img500 } from "../api/moviedb";
-import { Colors } from "../constants/Colors";
+import { Colors, useThemeColors } from "../constants/Colors";
 
 export default function Cast({ cast, navigation }) {
+  const colors = useThemeColors(); // Lấy màu dựa trên darkMode
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Diễn viên chính</Text>
+      <Text style={[styles.header,{color:colors.white}]}>Diễn viên chính</Text>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -37,7 +38,7 @@ export default function Cast({ cast, navigation }) {
                     style={styles.image}
                   />
                 </View>
-                <Text style={styles.name}>
+                <Text style={[styles.name,{color:colors.white}]}>
                   {person?.name.length > 12
                     ? person?.name.slice(0, 12) + "..."
                     : person?.name}
@@ -60,10 +61,10 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   header: {
-    color: "white",
     marginHorizontal: 8,
     marginBottom: 5,
     fontSize: 24,
+    fontWeight: '600'
   },
   item: {
     alignItems: "center",
@@ -84,7 +85,6 @@ const styles = StyleSheet.create({
     width: 96,
   },
   name: {
-    color: "white",
     lineHeight: 20,
     fontSize: 12,
   },

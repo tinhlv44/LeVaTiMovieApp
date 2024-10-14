@@ -3,44 +3,94 @@
  * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
  */
 
+import { useMyContextController } from "../store";
+
+// Tạo hàm để lấy giá trị màu dựa trên darkMode
+const useColors = () => {
+    const [controller] = useMyContextController(); // Lấy darkMode từ context
+
+    // Các giá trị màu cho chế độ light và dark
+    const lightColors = {
+        background: '#ffffff',
+        text: '#000000',
+        primary: '#6200ea',
+        secondary: '#03dac4',
+    };
+
+    const darkColors = {
+        background: '#121212',
+        text: '#ffffff',
+        primary: '#bb86fc',
+        secondary: '#03dac4',
+    };
+
+    // Trả về màu dựa trên giá trị darkMode
+    return controller.darkMode ? darkColors : lightColors;
+};
+
+export default useColors;
+
+
+
 const tintColorLight = '#0a7ea4';
 const tintColorDark = '#fff';
 
 export const Colors = {
-  light: {
-    text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
-  },
-  dark: {
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
-  },
-  bgBlack:'#1A1A1D', //rgb(26,26,29)
-  bgBlack2:'#121212', //rgb(48,48,48)
-  bgLight:'#F5F5F5', //rgb(48,48,48)
-  bgLight2:'#FFFFFF', //rgb(48,48,48)
-  heart:'#ff4ed9',
-  textn300: 'rgb(163 163 163)',
-  white: 'white',
-  black: 'black',
-  main: '#E50914',
-  btn: '#A9A9A9',
-  btn2: '#FFC107',
-  btn3: '#0A84FF',
-  c: '#3CB371',
-  c2:'#42A5F5',
-  yellow: '#FFC107',
-  red: '#E50914',
-  green:'green'
+    light: {
+        darkmode: false,
+        text: '#11181C',
+        background: '#fff',
+        tint: '#E50914', // Giả sử tintColorLight là '#E50914'
+        icon: '#687076',
+        tabIconDefault: '#687076',
+        tabIconSelected: '#E50914',
+        bgBlack: '#fffbfb',
+        bgBlack2: '#f6f8ff',
+        white: 'black',
+        white2: '#626262',
+        bgBlackRBG: 'rgba(255, 251, 251, 1)',
+
+    },
+    dark: {
+        darkmode: true,
+        text: '#ECEDEE',
+        background: '#151718',
+        tint: '#E50914', // Giả sử tintColorDark là '#E50914'
+        icon: '#9BA1A6',
+        tabIconDefault: '#9BA1A6',
+        tabIconSelected: '#E50914',
+        bgBlack: '#1A1A1D',
+        bgBlack2: '#171717',
+        white: 'white',
+        white2: 'rgba(255,255,255,0.35)',
+        bgBlackRBG: 'rgba(48, 48, 48, 0.5)',
+    },
+    bgBlack: '#1A1A1D',
+    bgBlack2: '#121212',
+    bgLight: '#F5F5F5',
+    bgLight2: '#FFFFFF',
+    heart: '#ff4ed9',
+    textn300: 'rgb(163, 163, 163)',
+    white: 'white',
+    black: 'black',
+    main: '#E50914',
+    btn: '#A9A9A9',
+    btn2: '#FFC107',
+    btn3: '#0A84FF',
+    c: '#3CB371',
+    c2: '#42A5F5',
+    yellow: '#FFC107',
+    red: '#E50914',
+    green: 'green',
+    
 };
+
+// Tạo hàm để lấy giá trị màu sắc theo chế độ darkMode
+export const useThemeColors = () => {
+    const [controller] = useMyContextController(); // Lấy giá trị darkMode từ context
+    return controller.darkMode ? Colors.dark : Colors.light; // Trả về màu sắc phù hợp
+};
+
 //  Đỏ chủ đạo: #E50914
 // Nền tối: #1A1A1D hoặc #121212
 // Nền sáng: #F5F5F5 hoặc #FFFFFF

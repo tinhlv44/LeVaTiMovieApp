@@ -11,10 +11,12 @@ import {
 import { Formik } from "formik";
 import { changePasswordValidationSchema } from "../utils"; // Import validation schema
 import { getAuth, updatePassword } from "firebase/auth"; // Import Firebase Auth
+import { Colors, useThemeColors } from "../constants/Colors";
 
 const ChangePasswordScreen = ({ route }) => {
   const { userId } = route.params; // Get userId from params
   const [loading, setLoading] = useState(false);
+  const colors = useThemeColors(); // Lấy màu dựa trên darkMode
 
   const handleChangePassword = async (values) => {
     const { currentPassword, newPassword } = values;
@@ -39,8 +41,7 @@ const ChangePasswordScreen = ({ route }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Đổi Mật Khẩu</Text>
+    <View style={[styles.container, {backgroundColor:colors.bgBlack}]}>
 
       <Formik
         initialValues={{ currentPassword: "", newPassword: "", confirmPassword: "" }}
@@ -50,7 +51,7 @@ const ChangePasswordScreen = ({ route }) => {
         {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
           <>
             <TextInput
-              style={styles.input}
+              style={[styles.input, {backgroundColor: colors.bgBlack2, color:colors.white}]}
               placeholder="Mật khẩu hiện tại"
               placeholderTextColor="#888"
               secureTextEntry
@@ -63,7 +64,7 @@ const ChangePasswordScreen = ({ route }) => {
             )}
             
             <TextInput
-              style={styles.input}
+              style={[styles.input, {backgroundColor: colors.bgBlack2, color:colors.white}]}
               placeholder="Mật khẩu mới"
               placeholderTextColor="#888"
               secureTextEntry
@@ -76,7 +77,7 @@ const ChangePasswordScreen = ({ route }) => {
             )}
 
             <TextInput
-              style={styles.input}
+              style={[styles.input, {backgroundColor: colors.bgBlack2, color:colors.white}]}
               placeholder="Xác nhận mật khẩu mới"
               placeholderTextColor="#888"
               secureTextEntry
@@ -108,8 +109,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    justifyContent: "center",
-    backgroundColor: "#000", // Nền đen
+    paddingTop: 100
   },
   title: {
     fontSize: 24,
@@ -128,13 +128,15 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   changePasswordButton: {
-    backgroundColor: "#f50057", // Màu sắc cho nút đổi mật khẩu
+    backgroundColor: Colors.main,
     padding: 10,
     borderRadius: 8,
     alignSelf: "center",
+    width: '100%',
+    alignItems:'center'
   },
   changePasswordButtonText: {
-    color: "#fff",
+    color: Colors.white,
     fontSize: 18,
     fontWeight: "bold",
   },

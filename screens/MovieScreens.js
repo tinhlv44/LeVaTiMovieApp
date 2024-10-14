@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
-import { Colors } from "../constants/Colors";
+import { Colors, useThemeColors } from "../constants/Colors";
 import MovieList from "../components/movieList";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -65,6 +65,8 @@ export default function MovieScreen() {
 
   const [controller, dispatch] = useMyContextController();
   const { uid } = controller;
+
+  const colors = useThemeColors(); // Lấy màu dựa trên darkMode
   useEffect(() => {
     checkFavoriteStatus();
   }, [controller]);
@@ -74,17 +76,6 @@ export default function MovieScreen() {
   useEffect(() => {
     navigation.setOptions({
       headerTitle: movie.title || "Movie Details",
-      headerShown: true,
-      headerTransparent: true,
-      headerTintColor: "#fff",
-      headerLeft: () => (
-        <TouchableOpacity
-          style={styles.btnBack}
-          onPress={() => navigation.goBack()}
-        >
-          <Ionicons name="arrow-back" size={28} color="white" />
-        </TouchableOpacity>
-      ),
       headerRight: () => (
         <TouchableOpacity
           style={styles.btnBack}
@@ -106,10 +97,10 @@ export default function MovieScreen() {
     // Kiểm tra xem params.item có phải là một đối tượng hay không
     if (params.item) {
       // Nếu có item, sử dụng trực tiếp
-      setId(params.id);
+      setId(params.item.id);
       setMovie(params.item);
-      getMovieCredits(params.id);
-      getSimilarMovies(params.id);
+      getMovieCredits(params.item.id);
+      getSimilarMovies(params.item.id);
     } else if (params.id) {
       // Nếu chỉ có id, fetch dữ liệu từ Firestore
       setId(params.id);
@@ -241,7 +232,7 @@ export default function MovieScreen() {
   return (
     <ScrollView
       contentContainerStyle={{ paddingBottom: 20 }}
-      style={styles.container}
+      style={[styles.container,{backgroundColor:colors.bgBlack}]}
       key={id}
     >
       <View style={styles.header}>
@@ -275,7 +266,7 @@ export default function MovieScreen() {
             <LinearGradient
               colors={[
                 "transparent", // Transparent at the top
-                "rgba(26, 26, 29, 1)", // Solid color at the bottom
+                colors.bgBlackRBG, // Solid color at the bottom
               ]}
               style={styles.gradient}
               start={{ x: 0, y: 0 }}
@@ -285,9 +276,9 @@ export default function MovieScreen() {
         )}
       </View>
 
-      <View style={styles.detailsContainer}>
+      <View style={[styles.detailsContainer, ,{backgroundColor:colors.bgBlack}]}>
         {/* Movie title */}
-        <Text style={styles.name}>{movie?.title}</Text>
+        <Text style={[styles.name, {color:colors.white}]}>{movie?.title}</Text>
         {/* Release date, status, runtime */}
         {movie?.id && (
           <Text style={styles.textDetail}>
@@ -345,7 +336,6 @@ export default function MovieScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.bgBlack,
   },
   header: {
     width: "100%",
@@ -365,13 +355,11 @@ const styles = StyleSheet.create({
   detailsContainer: {
     paddingHorizontal: 16,
     paddingVertical: 24,
-    backgroundColor: Colors.bgBlack,
   },
   btnBack: {
     padding: 8,
   },
   name: {
-    color: "white",
     textAlign: "center",
     fontWeight: "bold",
     fontSize: 28,
@@ -399,15 +387,16 @@ const styles = StyleSheet.create({
   },
   buttonBG: {
     alignItems: "center",
-    marginVertical: SPACING.space_24,
+    marginVertical: SPACING.space_10,
   },
   buttonText: {
-    borderRadius: BORDERRADIUS.radius_25 * 2,
+    borderRadius: BORDERRADIUS.radius_4,
     paddingHorizontal: SPACING.space_24,
     paddingVertical: SPACING.space_10,
     backgroundColor: COLORS.Orange,
     fontFamily: FONTFAMILY.poppins_medium,
     fontSize: FONTSIZE.size_14,
     color: COLORS.White,
+    fontWeight: '600'
   },
 });

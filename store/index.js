@@ -3,6 +3,8 @@ import { auth, db } from '../firebaseConfig';
 import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { Alert } from 'react-native';
 import { collection, query, where, getDocs, onSnapshot } from 'firebase/firestore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const MyContext = createContext();
 MyContext.displayName = 'MyAppContext';
@@ -11,43 +13,59 @@ MyContext.displayName = 'MyAppContext';
 const reducer = (state, action) => {
     switch (action.type) {
         case "USER_LOGIN":
-            return { ...state, userLogin: action.value, uid: action.uid }; // Save uid on login
+            return { ...state, userLogin: action.value, uid: action.uid };
         case "LOGOUT":
-            return { ...state, userLogin: null, uid: null }; // Clear uid on logout
-        case "UPDATE_USER": // New case to update user data
-            return { ...state, userLogin: action.value }; // Update user data
+            return { ...state, userLogin: null, uid: null };
+        case "UPDATE_USER":
+            return { ...state, userLogin: action.value };
+        case "TOGGLE_DARK_MODE":
+            return { ...state, darkMode: !state.darkMode };
+        case "SET_DARK_MODE": // Thêm case để đặt dark mode từ AsyncStorage
+            return { ...state, darkMode: action.value };
         default:
             return state;
     }
 };
 
+
 // Define MyContextControllerProvider
 const MyContextControllerProvider = ({ children }) => {
-    // Initialize state
     const initialState = {
         userLogin: null,
         uid: null,
         services: [],
+        darkMode: false, 
     };
+
     const [controller, dispatch] = useReducer(reducer, initialState);
 
-    // Listen for changes to user data
+    // Load darkMode from AsyncStorage when the app starts
     useEffect(() => {
-        if (controller.uid) {
-            const q = query(collection(db, "users"), where("uid", "==", controller.uid));
-            const unsubscribe = onSnapshot(q, (querySnapshot) => {
-                if (!querySnapshot.empty) {
-                    const userData = querySnapshot.docs[0].data();
-                    dispatch({ type: "UPDATE_USER", value: userData }); // Update user data on change
+        const loadDarkMode = async () => {
+            try {
+                const storedDarkMode = await AsyncStorage.getItem('darkMode');
+                if (storedDarkMode !== null) {
+                    dispatch({ type: 'SET_DARK_MODE', value: JSON.parse(storedDarkMode) });
                 }
-            });
+            } catch (e) {
+                console.log('Lỗi khi tải dark mode:', e);
+            }
+        };
+        loadDarkMode();
+    }, []);
 
-            // Cleanup listener on unmount
-            return () => unsubscribe();
-        }
-    }, [controller.uid]);
+    // Save darkMode to AsyncStorage whenever it changes
+    useEffect(() => {
+        const saveDarkMode = async () => {
+            try {
+                await AsyncStorage.setItem('darkMode', JSON.stringify(controller.darkMode));
+            } catch (e) {
+                console.log('Lỗi khi lưu dark mode:', e);
+            }
+        };
+        saveDarkMode();
+    }, [controller.darkMode]);
 
-    // UseMemo for performance optimization
     const value = useMemo(() => [controller, dispatch], [controller, dispatch]);
 
     return (
@@ -56,6 +74,7 @@ const MyContextControllerProvider = ({ children }) => {
         </MyContext.Provider>
     );
 };
+
 
 // Define useMyContextController
 const useMyContextController = () => {
@@ -97,9 +116,14 @@ const logout = async (dispatch) => {
     }
 };
 
+const toggleDarkMode = (dispatch) => {
+    dispatch({ type: "TOGGLE_DARK_MODE" });
+};
+
 export {
     MyContextControllerProvider,
     useMyContextController,
     login,
-    logout
+    logout,
+    toggleDarkMode
 };

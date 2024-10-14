@@ -12,7 +12,7 @@ import {
 import {SafeAreaView} from 'react-native-safe-area-context'
 //import FontAwesome from '@expo/vector-icons/FontAwesome';
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
-import { Colors } from "../constants/Colors";
+import { Colors, useThemeColors } from "../constants/Colors";
 import MovieList from "../components/movieList";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -33,12 +33,16 @@ export default function PersonScreens() {
   const [personMovie, setPersonMovie] = useState([]);
   const [person, setPerson] = useState([]);
   const [loading, setLoanging] = useState(false);
+  const colors = useThemeColors(); // Lấy màu dựa trên darkMode
 
   useEffect(() => {
     //Lấy api chi tiết phim
     setLoanging(true);
     getMoviesDetails(item.id);
     getPersonMovies(item.id);
+    navigation.setOptions({
+      headerTitle: person?.name || "Cast Details",
+    })
   }, [item]);
   const getMoviesDetails = async id => {
     const data = await fetchPersonDetails(id);
@@ -54,11 +58,11 @@ export default function PersonScreens() {
   };
   return (
     <ScrollView
-      contentContainerStyle={{ paddingBottom: 20 }}
-      style={styles.container}
+      contentContainerStyle={{ paddingBottom: 20, paddingTop: 80 }}
+      style={[styles.container,{backgroundColor:colors.bgBlack}]}
     >
       {/* Nút trở lại */}
-      <SafeAreaView style={styles.viewSafe}>
+      {/* <SafeAreaView style={styles.viewSafe}>
         <TouchableOpacity
           style={styles.btnBack}
           onPress={() => navigation.goBack()}
@@ -75,7 +79,7 @@ export default function PersonScreens() {
             color={isFavourite ? Colors.heart : "white"}
           />
         </TouchableOpacity>
-      </SafeAreaView>
+      </SafeAreaView> */}
       {
         loading ? (
           <Loading />
@@ -98,7 +102,7 @@ export default function PersonScreens() {
             {/* Chi tiết phim */}
             <View style={styles.deatil}>
               {/* Ten phim */}
-              <Text style={styles.name}>{person?.name}</Text>
+              <Text style={[styles.name,{color:colors.white}]}>{person?.name}</Text>
               {/* Địa chỉ */}
               <Text style={styles.address}>{person?.place_of_birth}</Text>
             </View>
@@ -122,7 +126,7 @@ export default function PersonScreens() {
               </View>
             </View>
             <View style={styles.bio}>
-              <Text style={styles.textHeader}>Biography</Text>
+              <Text style={[styles.textHeader,{color:colors.white}]}>Biography</Text>
               <Text style={styles.textContent}>
                 {person?.biography || 'N/A'}
               </Text>
@@ -143,7 +147,6 @@ export default function PersonScreens() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.bgBlack,
   },
   viewSafe: {
     flexDirection: "row",
@@ -159,7 +162,6 @@ const styles = StyleSheet.create({
     shadowOffset:{width:0, height:5},
     shadowOpacity:1,
     flexDirection:"row",
-
     justifyContent:'center'
 
   },
@@ -174,7 +176,6 @@ const styles = StyleSheet.create({
     padding: 1,
   },
   name: {
-    color: "white",
     textAlign: "center",
     fontWeight: "bold",
     fontSize: 30,
@@ -211,15 +212,16 @@ const styles = StyleSheet.create({
     paddingRight:16
   },
   bio:{
-    marginHorizontal: 8
+    marginHorizontal: 8,
+    marginVertical: 10
   },
   textHeader: {
     color: "white",
     fontWeight: "600",
   },
   textContent: {
-    color: "rgb(163 163 163)",
     lineHeight: 16,
     fontSize: 12,
+    color: Colors.textn300
   },
 });

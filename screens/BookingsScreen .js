@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Text, View, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { COLORS, FONTFAMILY, FONTSIZE, SPACING } from '../constants/theme';
-import AppHeader from '../components/AppHeader';
 import { db } from '../firebaseConfig';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { useMyContextController } from '../store';
-import { Colors } from '../constants/Colors';
+import { Colors, useThemeColors } from '../constants/Colors';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const BookingsScreen = ({ navigation }) => {
   const [bookings, setBookings] = useState([]);
@@ -13,6 +13,7 @@ const BookingsScreen = ({ navigation }) => {
 
   const [controller] = useMyContextController();
   const { uid } = controller;
+  const colors = useThemeColors(); // Lấy màu dựa trên darkMode
 
   useEffect(() => {
     let unsubscribe;
@@ -62,17 +63,18 @@ const BookingsScreen = ({ navigation }) => {
     <TouchableOpacity
       style={[styles.bookingItem, { backgroundColor: 
         //getStatusColor(item.state) 
-        "#15161b"
+        //"#15161b"
+        colors.bgBlack2
     }]}
       onPress={() => navigation.navigate('TicketScreen', { ticketData: item })}
     >
       <View style={styles.bookingInfo}>
-        <Text style={styles.title}>{item.movieId}</Text>
-        <Text style={styles.subtitle}>Date: {item.date}</Text>
-        <Text style={styles.subtitle}>Time: {item.time}</Text>
+        <Text style={[styles.title,{color:colors.white}]}>{item.movieId}</Text>
+        <Text style={[styles.subtitle,{color:colors.white}]}>Date: {item.date}</Text>
+        <Text style={[styles.subtitle,{color:colors.white}]}>Time: {item.time}</Text>
       </View>
       <View style={styles.bookingDetails}>
-        <Text style={styles.totalPrice}>${item.totalPrice}k VNĐ</Text>
+        <Text style={[styles.totalPrice,{color:colors.white}]}>${item.totalPrice}k VNĐ</Text>
         <Text style={[styles.status, {color: item.state === 0 ? Colors.yellow : item.state === 1 ? Colors.green : Colors.red}]}>
           {item.state === 0 ? 'Chưa thanh toán' : item.state === 1 ? 'Đã thanh toán' : 'Đã hủy'}
         </Text>
@@ -81,14 +83,14 @@ const BookingsScreen = ({ navigation }) => {
   );
 
   return (
-    <View style={styles.container}>
-      <AppHeader name="close" header="My Bookings" action={() => navigation.goBack()} />
+    <SafeAreaView style={[styles.container,{backgroundColor:colors.bgBlack}]}>
+      <Text style={[styles.title, {color: colors.white, textAlign:'center'}]}>Lịch sử đặt vé</Text>
       {uid === null ? (
-        <Text style={styles.emptyMessage}>Please Login</Text>
+        <Text style={[styles.emptyMessage,{color:colors.white}]}>Please Login</Text>
       ) : loading ? (
         <ActivityIndicator size="large" color={COLORS.Orange} style={styles.loadingIndicator} />
       ) : bookings.length === 0 ? (
-        <Text style={styles.emptyMessage}>No bookings found.</Text>
+        <Text style={[styles.emptyMessage,{color:colors.white}]}>No bookings found.</Text>
       ) : (
         <FlatList
           data={bookings}
@@ -97,15 +99,14 @@ const BookingsScreen = ({ navigation }) => {
           contentContainerStyle={styles.bookingList}
         />
       )}
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.Black,
-    padding: SPACING.space_20,
+    paddingHorizontal: 12
   },
   bookingItem: {
     borderRadius: 15,
@@ -122,20 +123,13 @@ const styles = StyleSheet.create({
   bookingDetails: {
     alignItems: 'flex-end', // Căn phải cho thông tin bên phải
   },
-  title: {
-    fontFamily: FONTFAMILY.poppins_medium,
-    fontSize: FONTSIZE.size_18,
-    color: COLORS.White,
-  },
   subtitle: {
     fontFamily: FONTFAMILY.poppins_regular,
     fontSize: FONTSIZE.size_14,
-    color: COLORS.White,
   },
   totalPrice: {
     fontFamily: FONTFAMILY.poppins_bold,
     fontSize: FONTSIZE.size_16,
-    color: COLORS.White,
   },
   status: {
     fontFamily: FONTFAMILY.poppins_regular,
@@ -157,6 +151,10 @@ const styles = StyleSheet.create({
     fontSize: FONTSIZE.size_16,
     textAlign: 'center',
     marginTop: SPACING.space_20,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
   },
 });
 

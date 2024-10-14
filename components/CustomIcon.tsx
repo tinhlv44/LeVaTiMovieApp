@@ -8,6 +8,7 @@ import Feather from "@expo/vector-icons/Feather";
 import Entypo from "@expo/vector-icons/Entypo";
 import AntDesign from '@expo/vector-icons/AntDesign';
 import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 
 type IconType =
   | "MaterialIcons"
@@ -17,7 +18,8 @@ type IconType =
   | "MaterialCommunityIcons"
   | "Entypo"
   | "AntDesign"
-  | "SimpleLineIcons";
+  | "SimpleLineIcons"
+  | "FontAwesome5";
 
 interface CustomIconProps {
   type?: IconType;
@@ -67,6 +69,9 @@ const CustomIcon: React.FC<CustomIconProps> = ({
       break;
     case "SimpleLineIcons":
       IconComponent = SimpleLineIcons;
+      break;
+    case "FontAwesome5":
+      IconComponent = FontAwesome5;
       break;
     default:
       IconComponent = MaterialIcons; // Đặt mặc định nếu không có `type`

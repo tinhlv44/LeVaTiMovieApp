@@ -15,6 +15,7 @@ import * as ImagePicker from "expo-image-picker";
 import { uploadBytes, ref } from "firebase/storage"; // Import necessary functions from Firebase Storage
 import { storage, storageBucketUrl } from "../firebaseConfig"; // Import Firebase Storage
 import { updateUserValidationSchema } from "../utils";
+import { Colors, useThemeColors } from "../constants/Colors";
 
 
 
@@ -27,6 +28,8 @@ const UpdateUserScreen = ({ route }) => {
     avatar: "",
   });
   const [selectedImage, setSelectedImage] = useState(null);
+  
+  const colors = useThemeColors(); // Lấy màu dựa trên darkMode
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -66,6 +69,7 @@ const UpdateUserScreen = ({ route }) => {
       await updateDoc(doc(db, "users", userId), updatedValues);
       Alert.alert("Thông tin người dùng đã được cập nhật thành công!");
       setSelectedImage(null); // Clear selected image after update
+
     } catch (error) {
       console.error("Error updating user:", error);
       Alert.alert("Cập nhật thông tin thất bại!");
@@ -92,7 +96,7 @@ const UpdateUserScreen = ({ route }) => {
   }, []);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, {backgroundColor:colors.bgBlack}]}>
       {selectedImage || initialValues.avatar ? (
         <Image
           source={{
@@ -108,7 +112,7 @@ const UpdateUserScreen = ({ route }) => {
         />
       ) : null}
       <TouchableOpacity style={styles.pickImageButton} onPress={pickImage}>
-        <Text style={styles.pickImageButtonText}>Chọn ảnh</Text>
+        <Text style={styles.pickImageButtonText}>Chọn avatar</Text>
       </TouchableOpacity>
 
       <Formik
@@ -120,7 +124,7 @@ const UpdateUserScreen = ({ route }) => {
         {({ handleChange, handleBlur, handleSubmit, values, errors }) => (
           <>
             <TextInput
-              style={styles.input}
+              style={[styles.input, {backgroundColor: colors.bgBlack2, color:colors.white}]}
               placeholder="Họ và tên"
               placeholderTextColor="#888"
               onChangeText={handleChange("fullName")}
@@ -129,7 +133,7 @@ const UpdateUserScreen = ({ route }) => {
             />
             {errors.fullName && <Text style={styles.errorText}>{errors.fullName}</Text>}
             <TextInput
-              style={styles.input}
+              style={[styles.input, {backgroundColor: colors.bgBlack2, color:colors.white}]}
               placeholder="Số điện thoại"
               placeholderTextColor="#888"
               keyboardType="phone-pad"
@@ -139,7 +143,7 @@ const UpdateUserScreen = ({ route }) => {
             />
             {errors.phone && <Text style={styles.errorText}>{errors.phone}</Text>}
             <TextInput
-              style={styles.input}
+              style={[styles.input, {backgroundColor: colors.bgBlack2, color:colors.white}]}
               placeholder="Địa chỉ"
               placeholderTextColor="#888"
               onChangeText={handleChange("address")}
@@ -161,8 +165,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    justifyContent: "center",
-    backgroundColor: "#000", // Nền đen
+    paddingTop: 100
   },
   avatar: {
     width: 100,
@@ -172,7 +175,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   pickImageButton: {
-    backgroundColor: "#f50057", // Màu sắc cho nút chọn ảnh
+    backgroundColor: Colors.main,
     padding: 10,
     borderRadius: 8,
     alignSelf: "center",
@@ -189,18 +192,18 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 15,
     paddingHorizontal: 10,
-    color: "#fff", // Màu chữ trắng
-    backgroundColor: "#222", // Nền input
     borderRadius: 5,
   },
   updateButton: {
-    backgroundColor: "#f50057", // Màu sắc cho nút cập nhật
+    backgroundColor: Colors.main,
     padding: 10,
     borderRadius: 8,
     alignSelf: "center",
+    width:'100%',
+    alignItems:'center'
   },
   updateButtonText: {
-    color: "#fff",
+    color: Colors.white,
     fontSize: 18,
     fontWeight: "bold",
   },

@@ -1,5 +1,6 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
+import { StatusBar } from "expo-status-bar";
 
 import TabNavigator from "./TabNavigator";
 import { SignupScreen } from "../screens/SignupScreen";
@@ -12,46 +13,48 @@ import SeatBookingScreen from "../screens/SeatBookingScreen";
 import UpdateUserScreen from "../screens/UpdateUserScreen";
 import ChangePasswordScreen from "../screens/ChangePasswordScreen";
 import MovieVerticalList from "../screens/ListMovieScreens";
-import { Colors } from "../constants/Colors";
+import { useThemeColors } from "../constants/Colors";
 import TicketScreen from "../screens/TicketScreen";
 import FavoriteMoviesScreen from "../screens/FavoriteMoviesScreen";
+import PaymentScreen from "../screens/PaymentScreen";
 
 const Stack = createStackNavigator();
 
-const AppStack = () => (
+const AppStack = () => {
+  const Colors = useThemeColors(); // Lấy màu dựa trên darkMode
+  return (
   <Stack.Navigator
     initialRouteName="App"
-    screenOptions={{ headerShown: false }}
+    screenOptions={{ 
+      headerShown: true,
+        headerTintColor: Colors.white, 
+        headerTransparent: true,
+     }}
   >
-    <Stack.Screen name="App" component={TabNavigator} />
+    <Stack.Screen name="App" component={TabNavigator}
+      options={{
+        headerShown: false,
+      }}
+    />
     <Stack.Screen 
       name="Login" 
       component={LoginScreen} 
       options={{
-        headerShown: true,
-        headerTintColor: "#fff", 
-        headerTransparent: true,
-        title:''
+        title:'Đăng nhập'
       }}
     />
     <Stack.Screen 
       name="Signup" 
       component={SignupScreen} 
       options={{
-        headerShown: true,
-        headerTintColor: "#fff", 
-        headerTransparent: true,
-        title:''
+        title:'Đăng ký'
       }}
     />
     <Stack.Screen 
       name="ForgotPassword" 
       component={ForgotPasswordScreen} 
       options={{
-        headerShown: true,
-        headerTintColor: "#fff", 
-        headerTransparent: true,
-        title:''
+        title:'Quên mật khẩu'
       }}
     />
     <Stack.Screen
@@ -65,6 +68,9 @@ const AppStack = () => (
     <Stack.Screen
       name="Search"
       component={SearchScreen}
+      options={{
+        headerShown:false
+      }}
     />
     <Stack.Screen
       name="SeatBooking"
@@ -73,58 +79,54 @@ const AppStack = () => (
     <Stack.Screen
       name="UpdateUser"
       options={{
-        headerShown: true,
         title: "Thay đổi thông tin",
-        headerTintColor: "#fff", // Màu chữ trắng
-        headerTransparent: true,
       }}
       component={UpdateUserScreen}
+      
     />
 
     <Stack.Screen
       name="ChangePassword"
       options={{
-        headerShown: true,
         title: "Đổi mật khẩu",
-        headerTintColor: "#fff", // Màu chữ trắng
-        headerTransparent: true,
       }}
       component={ChangePasswordScreen}
     />
     <Stack.Screen
       name="FavoriteMovies"
       options={{
-        headerShown: true,
         title: "Yêu thích",
-        headerTintColor: "#fff", // Màu chữ trắng
-        headerTransparent: true,
       }}
       component={FavoriteMoviesScreen}
     />
     <Stack.Screen
       name="ListMovie"
       options={{
-        headerShown: true,
-        headerTintColor: "#fff", // Màu chữ trắng
-        headerStyle: {backgroundColor:Colors.bgBlack}
       }}
       component={MovieVerticalList}
     />
     <Stack.Screen
       name="TicketScreen"
       options={{
-        headerShown: true,
-        headerTintColor: "#fff", // Màu chữ trắng
-        headerStyle: {backgroundColor:Colors.bgBlack}
+        title:'Chi tiết vé'
       }}
       component={TicketScreen}
     />
+    <Stack.Screen
+      name="Payment"
+      options={{
+        title:'Thanh toán'
+      }}
+      component={PaymentScreen}
+    />
   </Stack.Navigator>
-);
+)};
 
 export default function AppNavigation() {
+  const Colors = useThemeColors(); // Lấy màu dựa trên darkMode
   return (
-    <NavigationContainer>
+    <NavigationContainer>      
+      <StatusBar style={Colors.darkmode ? "light" : "dark" } backgroundColor={Colors.bgBlack} />
       <AppStack />
     </NavigationContainer>
   );

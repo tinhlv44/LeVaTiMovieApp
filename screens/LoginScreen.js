@@ -10,12 +10,16 @@ import { loginValidationSchema } from "../utils";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { login, useMyContextController } from "../store";
 import Logo from "../components/Logo";
+import { useThemeColors } from "../constants/Colors";
+import FacebookLoginButton from "../components/Facebook";
+import GoogleLoginButton from "../components/Google";
 
 export const LoginScreen = ({ navigation }) => {
   const [errorState, setErrorState] = useState("");
   const { passwordVisibility, handlePasswordVisibility, rightIcon } = useTogglePasswordVisibility();
   const [controller, dispatch] = useMyContextController();
   const { userLogin } = controller;
+  const colors = useThemeColors(); // Lấy màu dựa trên darkMode
 
   const handleLogin = async (values) => {
     setErrorState("");
@@ -57,7 +61,7 @@ export const LoginScreen = ({ navigation }) => {
   }, [userLogin]);
 
   return (
-    <View isSafe style={styles.container}>
+    <View style={[styles.container,{backgroundColor:colors.bgBlack}]}>
       <KeyboardAwareScrollView enableOnAndroid={true}>
         {/* Logo và tiêu đề */}
         <View style={styles.logoContainer}>
@@ -129,7 +133,9 @@ export const LoginScreen = ({ navigation }) => {
             </>
           )}
         </Formik>
-
+        <Text style={[styles.linear,{color:colors.white}]}>Hoặc</Text>
+        <FacebookLoginButton />
+        <GoogleLoginButton />
         {/* Button điều hướng đến màn hình Đăng ký */}
         <Button
           style={styles.borderlessButtonContainer}
@@ -153,12 +159,12 @@ export const LoginScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.black2,
     paddingHorizontal: 12,
+    paddingTop: 80
   },
   logoContainer: {
     alignItems: "center",
-    padding:50
+    padding:30
   },
   screenTitle: {
     fontSize: 32,
@@ -185,4 +191,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  linear:{
+    textAlign: 'center',
+    fontWeight: '600'
+  }
 });

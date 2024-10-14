@@ -143,74 +143,75 @@ const SeatBookingScreen = ({ navigation, route }) => {
   };
 
   const BookSeats = async () => {
-    if (selectedSeatArray.length === 0 || !selectedShowtime) {
-      ToastAndroid.show("Vui lòng chọn ghế và suất chiếu!", ToastAndroid.SHORT);
-      return;
-    }
+    navigation.navigate('Payment')
+    // if (selectedSeatArray.length === 0 || !selectedShowtime) {
+    //   ToastAndroid.show("Vui lòng chọn ghế và suất chiếu!", ToastAndroid.SHORT);
+    //   return;
+    // }
 
-    // Tạo đối tượng dữ liệu cần lưu cho đặt ghế
-    const bookingData = {
-      movieId: route.params.id,
-      cinemaId: selectedShowtime.cinemaId,
-      date: selectedShowtime.date,
-      time: selectedShowtime.time,
-      seats: selectedSeatArray,
-      totalPrice: price,
-      state: 0,
-      uid: uid
-    };
+    // // Tạo đối tượng dữ liệu cần lưu cho đặt ghế
+    // const bookingData = {
+    //   movieId: route.params.id,
+    //   cinemaId: selectedShowtime.cinemaId,
+    //   date: selectedShowtime.date,
+    //   time: selectedShowtime.time,
+    //   seats: selectedSeatArray,
+    //   totalPrice: price,
+    //   state: 0,
+    //   uid: uid
+    // };
 
-    try {
-      // Tạo một document mới trong collection "bookings" (nếu cần lưu thông tin đặt vé)
-      const bookingRef = doc(collection(db, "bookings"));
-      await setDoc(bookingRef, bookingData);
+    // try {
+    //   // Tạo một document mới trong collection "bookings" (nếu cần lưu thông tin đặt vé)
+    //   const bookingRef = doc(collection(db, "bookings"));
+    //   await setDoc(bookingRef, bookingData);
 
-      // Cập nhật thông tin ghế đã đặt trong collection "showtimes"
-      const showtimeRef = doc(db, "showtimes", selectedShowtime.date);
+    //   // Cập nhật thông tin ghế đã đặt trong collection "showtimes"
+    //   const showtimeRef = doc(db, "showtimes", selectedShowtime.date);
 
-      // Lấy thông tin ghế hiện tại của suất chiếu
-      const showtimeSnap = await getDoc(showtimeRef);
+    //   // Lấy thông tin ghế hiện tại của suất chiếu
+    //   const showtimeSnap = await getDoc(showtimeRef);
 
-      if (showtimeSnap.exists()) {
-        const showtimeData = showtimeSnap.data();
+    //   if (showtimeSnap.exists()) {
+    //     const showtimeData = showtimeSnap.data();
 
-        // Tìm đúng suất chiếu dựa trên `cinemaId` và `time`
-        const showtimeEntries = showtimeData[selectedShowtime.cinemaId];
-        const showtimeIndex = showtimeEntries.findIndex(
-          (entry) => entry.time === selectedShowtime.time
-        );
+    //     // Tìm đúng suất chiếu dựa trên `cinemaId` và `time`
+    //     const showtimeEntries = showtimeData[selectedShowtime.cinemaId];
+    //     const showtimeIndex = showtimeEntries.findIndex(
+    //       (entry) => entry.time === selectedShowtime.time
+    //     );
 
-        if (showtimeIndex !== -1) {
-          // Cập nhật danh sách ghế cho suất chiếu cụ thể
-          const currentSeats = showtimeEntries[showtimeIndex].seats;
+    //     if (showtimeIndex !== -1) {
+    //       // Cập nhật danh sách ghế cho suất chiếu cụ thể
+    //       const currentSeats = showtimeEntries[showtimeIndex].seats;
 
-          // Loại bỏ các ghế trùng lặp
-          const updatedSeats = [
-            ...new Set([...currentSeats, ...selectedSeatArray]),
-          ];
+    //       // Loại bỏ các ghế trùng lặp
+    //       const updatedSeats = [
+    //         ...new Set([...currentSeats, ...selectedSeatArray]),
+    //       ];
 
-          // Cập nhật ghế trong Firestore
-          showtimeEntries[showtimeIndex].seats = updatedSeats;
+    //       // Cập nhật ghế trong Firestore
+    //       showtimeEntries[showtimeIndex].seats = updatedSeats;
 
-          // Cập nhật toàn bộ thông tin của rạp (cinemaId) trong document "showtimes"
-          await updateDoc(showtimeRef, {
-            [selectedShowtime.cinemaId]: showtimeEntries,
-          });
+    //       // Cập nhật toàn bộ thông tin của rạp (cinemaId) trong document "showtimes"
+    //       await updateDoc(showtimeRef, {
+    //         [selectedShowtime.cinemaId]: showtimeEntries,
+    //       });
 
-          console.log("Cập nhật ghế thành công!", updatedSeats);
-          alert("Đặt ghế thành công!");
-        } else {
-          console.log("Không tìm thấy suất chiếu phù hợp!");
-          alert("Không tìm thấy suất chiếu phù hợp!");
-        }
-      } else {
-        console.log("Document không tồn tại!");
-        alert("Suất chiếu không tồn tại!");
-      }
-    } catch (error) {
-      console.error("Lỗi khi đặt ghế: ", error);
-      alert("Có lỗi xảy ra, vui lòng thử lại!");
-    }
+    //       console.log("Cập nhật ghế thành công!", updatedSeats);
+    //       alert("Đặt ghế thành công!");
+    //     } else {
+    //       console.log("Không tìm thấy suất chiếu phù hợp!");
+    //       alert("Không tìm thấy suất chiếu phù hợp!");
+    //     }
+    //   } else {
+    //     console.log("Document không tồn tại!");
+    //     alert("Suất chiếu không tồn tại!");
+    //   }
+    // } catch (error) {
+    //   console.error("Lỗi khi đặt ghế: ", error);
+    //   alert("Có lỗi xảy ra, vui lòng thử lại!");
+    // }
   };
 
   return (
@@ -370,7 +371,7 @@ const SeatBookingScreen = ({ navigation, route }) => {
           <Text style={styles.price}>{price}.000,00 VND</Text>
         </View>
         <TouchableOpacity onPress={BookSeats}>
-          <Text style={styles.buttonText}>Đặt Ghế</Text>
+          <Text style={styles.buttonText}>Đặt vé</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>

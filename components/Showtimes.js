@@ -3,9 +3,11 @@ import { View, Text, FlatList, StyleSheet, Image, TouchableOpacity } from 'react
 import moment from 'moment';
 import { img342 } from '../api/moviedb';
 import { useNavigation } from '@react-navigation/native';
+import { useThemeColors } from '../constants/Colors';
 
 const Showtimes = ({ showtimes }) => {
   const navigation = useNavigation()
+  const colors = useThemeColors(); // Lấy màu dựa trên darkMode
   // Lấy thời gian hiện tại
 
   const currentTime = moment();
@@ -29,12 +31,12 @@ const Showtimes = ({ showtimes }) => {
     const time = `${parts[4]}:${parts[5].length === 1 ? parts[5]+"0" : parts[5]}`; // Giờ chiếu từ id
 
     return (
-      <TouchableOpacity key={item.id} style={styles.timeContainer} onPress={() => navigation.navigate("Movie", {id: item.movieId} )}>
+      <TouchableOpacity key={item.id} style={[styles.timeContainer,{backgroundColor:colors.bgBlack}]} onPress={() => navigation.navigate("Movie", {id: item.movieId} )}>
         {/* Đảm bảo bao hình ảnh trong một View */}
         <View style={styles.imageContainer}>
           <Image source={{ uri: img342(item.img) }} style={styles.image} />
         </View>
-        <Text style={styles.timeText}>
+        <Text style={[styles.timeText,{color:colors.white}]}>
           {time} - {item.title.length > 22
                         ? item.title.slice(0, 22) + "..."
                         : item.title}

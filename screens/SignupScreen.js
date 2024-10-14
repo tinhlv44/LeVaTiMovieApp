@@ -11,9 +11,11 @@ import { Images, Colors } from "../config";
 import { useTogglePasswordVisibility } from "../hooks";
 import { signupValidationSchema } from "../utils";
 import { doc, setDoc } from "firebase/firestore"; // Import Firestore
+import { useThemeColors } from "../constants/Colors";
 
 export const SignupScreen = ({ navigation }) => {
   const [errorState, setErrorState] = useState("");
+  const colors = useThemeColors(); // Lấy màu dựa trên darkMode
   const {
     passwordVisibility,
     handlePasswordVisibility,
@@ -59,12 +61,12 @@ export const SignupScreen = ({ navigation }) => {
   };
 
   return (
-    <View isSafe style={styles.container}>
+    <View style={[styles.container,{backgroundColor:colors.bgBlack}]}>
       <KeyboardAwareScrollView enableOnAndroid={true}>
         {/* LogoContainer: consits app logo and screen title */}
         <View style={styles.logoContainer}>
           {/* <Logo uri={Images.logo} /> */}
-          <Text style={styles.screenTitle}>Tạo tài khoản mới!</Text>
+          <Text style={[styles.screenTitle,{color:colors.white}]}>Tạo tài khoản mới!</Text>
         </View>
         {/* Formik Wrapper */}
         <Formik
@@ -203,9 +205,8 @@ export const SignupScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.black2,
     paddingHorizontal: 12,
-    marginTop: 10
+    paddingTop: 60
   },
   logoContainer: {
     alignItems: "center",

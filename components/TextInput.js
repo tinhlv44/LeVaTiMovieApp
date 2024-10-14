@@ -5,6 +5,7 @@ import { View } from './View';
 import { Icon } from './Icon';
 import { Button } from './Button';
 import { Colors } from '../config';
+import { useThemeColors } from '../constants/Colors';
 
 export const TextInput = ({
   width = '100%',
@@ -13,10 +14,11 @@ export const TextInput = ({
   handlePasswordVisibility,
   ...otherProps
 }) => {
+  const colors = useThemeColors(); // Lấy màu dựa trên darkMode
   return (
     <View
       style={{
-        backgroundColor: Colors.white,
+        backgroundColor: colors.bgBlack2,
         borderRadius: 8,
         flexDirection: 'row',
         padding: 12,
@@ -39,7 +41,7 @@ export const TextInput = ({
           flex: 1,
           width: '100%',
           fontSize: 18,
-          color: Colors.black
+          color: colors.white
         }}
         placeholderTextColor={Colors.mediumGray}
         {...otherProps}

@@ -7,8 +7,10 @@ import { passwordResetSchema } from "../utils";
 import { Colors } from "../config";
 import { View, TextInput, Button, FormErrorMessage } from "../components";
 import { sendPasswordResetEmail } from "firebase/auth";
+import { useThemeColors } from "../constants/Colors";
 export const ForgotPasswordScreen = ({navigation}) => {
   const [errorState, setErrorState] = useState("");
+  const colors = useThemeColors(); // Lấy màu dựa trên darkMode
   const handleSendPasswordResetEmail = (values) => {
     // const { email } = values;
     //   sendPasswordResetEmail(auth,email)
@@ -26,9 +28,9 @@ export const ForgotPasswordScreen = ({navigation}) => {
     //   );
   };
   return (
-    <View isSafe style={styles.container}>
+    <View style={[styles.container,{backgroundColor:colors.bgBlack}]}>
       <View style={styles.innerContainer}>
-        <Text style={styles.screenTitle}>Quên mật khẩu</Text>
+        <Text style={[styles.screenTitle,{color:colors.white}]}>Quên mật khẩu</Text>
       </View>
       <Formik
         initialValues={{ email: "" }}
@@ -81,9 +83,8 @@ export const ForgotPasswordScreen = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.black2,
     paddingHorizontal: 12,
-    marginTop: 16
+    marginTop: 60
   },
   innercontainer: {
     alignItems: "center",

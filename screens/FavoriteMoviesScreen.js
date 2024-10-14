@@ -11,7 +11,7 @@ import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Loading from "../components/loading";
-import { Colors } from "../constants/Colors";
+import { Colors, useThemeColors } from "../constants/Colors";
 import { fallcallImageMovie, img342 } from "../api/moviedb";
 import { onSnapshot, doc, collection, query, where } from 'firebase/firestore';
 import { db } from '../firebaseConfig'; // Giả định bạn đã cấu hình Firebase Firestore
@@ -27,6 +27,7 @@ export default function FavoriteMoviesScreen() {
   const [controller] = useMyContextController();
   const { uid } = controller;
 
+  const colors = useThemeColors(); // Lấy màu dựa trên darkMode
   useEffect(() => {
     if (uid) {
       // Sử dụng onSnapshot để theo dõi thay đổi dữ liệu theo thời gian thực
@@ -64,7 +65,7 @@ export default function FavoriteMoviesScreen() {
   }, [uid]);
 
   return (
-    <SafeAreaView style={styles.safeView}>
+    <SafeAreaView style={[styles.safeView, {backgroundColor:colors.bgBlack}]}>
       {loading ? (
         <Loading />
       ) : favoriteMovies.length > 0 ? (
@@ -72,7 +73,7 @@ export default function FavoriteMoviesScreen() {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollView}
         >
-          <Text style={styles.text}>
+          <Text style={[styles.text, {color: colors.white}]}>
             Danh sách yêu thích ({favoriteMovies.length})
           </Text>
           <View style={styles.results}>
@@ -102,7 +103,7 @@ export default function FavoriteMoviesScreen() {
         </ScrollView>
       ) : (
         <View style={styles.noResult}>
-          <Text style={styles.text}>Không có phim được yêu thích nào!</Text>
+          <Text style={[styles.text, {color: colors.white}]}>Không có phim được yêu thích nào!</Text>
         </View>
       )}
     </SafeAreaView>
@@ -112,7 +113,6 @@ export default function FavoriteMoviesScreen() {
 // Thiết lập styles
 const styles = StyleSheet.create({
   safeView: {
-    backgroundColor: Colors.bgBlack,
     flex: 1,
     paddingTop: 40,
   },
@@ -123,8 +123,8 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 20,
     lineHeight: 28,
-    color: Colors.white,
     marginBottom: 10,
+    fontWeight:'600'
   },
   results: {
     flexDirection: "row",

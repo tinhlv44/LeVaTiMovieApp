@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
-import { Colors } from "../constants/Colors";
+import { Colors, useThemeColors } from "../constants/Colors";
 import Logo from "../components/Logo";
 import TrendingMovie from "../components/trendingMovie";
 import MovieList from "../components/movieList";
@@ -32,6 +32,7 @@ export default function HomeScreens() {
   const [firebaseMovies, setFirebaseMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
+  const colors = useThemeColors(); // Lấy màu dựa trên darkMode
 
   useEffect(() => {
     setLoading(true);
@@ -85,13 +86,13 @@ export default function HomeScreens() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, {backgroundColor:colors.bgBlack}]}>
       <SafeAreaView style={styles.viewSafe}>
         <View style={styles.barMenu}>
           {/* <FontAwesome5 name="bars" size={24} color="white" /> */}
           <Logo />
           <TouchableOpacity onPress={() => navigation.navigate("Search")}>
-            <FontAwesome5 name="search" size={24} color="white" />
+            <FontAwesome5 name="search" size={24} color={colors.white} />
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -106,10 +107,10 @@ export default function HomeScreens() {
           <TrendingMovie data={trending} />
 
           {/* Upcoming Movies */}
-          <MovieList title={"Sắp đến"} data={upcoming} />
+          <MovieList title={"Sắp đến"} data={upcoming} onPress={() => {navigation.navigate("ListMovie", {title: "Sắp đến", data:upcoming})}}/>
 
           {/* Top Rated Movies */}
-          <MovieList title={"Nổi bật"} data={topRated} />
+          <MovieList title={"Nổi bật"} data={topRated} onPress={() => {navigation.navigate("ListMovie", {title: "Nổi bật", data:topRated})}}/>
         </ScrollView>
       )}
     </View>
@@ -119,7 +120,6 @@ export default function HomeScreens() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.bgBlack,
   },
   viewSafe: {
     paddingVertical: 15,

@@ -12,7 +12,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
-import { Colors } from "../constants/Colors";
+import { Colors, useThemeColors } from "../constants/Colors";
 import Loading from "../components/loading";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { fallcallImageMovie, fetchSearchMovies, img342 } from "../api/moviedb";
@@ -22,6 +22,7 @@ export default function SearchScreen() {
   const navigation = useNavigation();
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
+  const colors = useThemeColors(); // Lấy màu dựa trên darkMode
 
   const handleSearch = query => {
     if (query.length > 2 && query ){
@@ -44,12 +45,12 @@ export default function SearchScreen() {
   };
   const handleTextDebounce = useCallback(debounce(handleSearch, 400), []) 
   return (
-    <SafeAreaView style={styles.safeView}>
+    <SafeAreaView style={[styles.safeView,{backgroundColor:colors.bgBlack}]}>
       <View style={styles.input}>
         <TextInput
           placeholder="Tìm kiếm"
           placeholderTextColor="lightgray"
-          style={styles.textInput}
+          style={[styles.textInput, ,{color:colors.white}]}
           onChangeText={handleTextDebounce}
         />
         <TouchableOpacity
@@ -67,7 +68,7 @@ export default function SearchScreen() {
           contentContainerStyle={{ paddingBottom: 15 }}
           style={styles.scrollView}
         >
-          <Text style={styles.text}>Kết quả ({results.length})</Text>
+          <Text style={[styles.text,{color:colors.white}]}>Kết quả ({results.length})</Text>
           <View style={styles.results}>
             {results.map((item, index) => {
               return (
@@ -108,8 +109,8 @@ export default function SearchScreen() {
 }
 const styles = StyleSheet.create({
   safeView: {
-    backgroundColor: Colors.bgBlack,
     flex: 1,
+    paddingTop: 8
   },
   input: {
     flexDirection: "row",
@@ -140,7 +141,6 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 20,
     lineHeight: 28,
-    color: "white",
   },
   results: {
     borderRadius: 10,

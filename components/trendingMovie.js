@@ -19,6 +19,7 @@ import {
   SPACING,
 } from "../constants/theme";
 import CustomIcon from "./CustomIcon";
+import { useThemeColors } from "../constants/Colors";
 
 var { width, height } = Dimensions.get("window");
 
@@ -46,13 +47,13 @@ const genres = {
 
 export default function TrendingMovie({ data }) {
   const navigation = useNavigation();
-  const [activeIndex, setActiveIndex] = useState(0);
+  const colors = useThemeColors(); // Lấy màu dựa trên darkMode
   const handleClick = (item) => {
     navigation.navigate("Movie", item);
   };
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Xu hướng</Text>
+      <Text style={[styles.text, {color: colors.white}]}>Xu hướng</Text>
 
       <Carousel
         data={data}
@@ -70,33 +71,11 @@ export default function TrendingMovie({ data }) {
         autoplayDelay={5000} // Chờ 5 giây trước khi bắt đầu
         autoplayInterval={7000} // 3 giây giữa mỗi slide
       />
-      {/* <View>
-        <Pagination
-          dotsLength={data.length} // Số lượng dấu chấm
-          activeDotIndex={activeIndex} // Slide hiện tại
-          containerStyle={{ paddingVertical: 10 }}
-          dotStyle={{
-            width: 10,
-            height: 10,
-            borderRadius: 5,
-            backgroundColor: "red", // Màu dấu chấm active,
-            margin: 0,
-            padding: 0,
-          }}
-          inactiveDotStyle={{
-            backgroundColor: "gray", // Màu dấu chấm inactive
-            margin: 0,
-            padding: 0,
-          }}
-          inactiveDotOpacity={0.4}
-          inactiveDotScale={0.6}
-        />
-      </View> */}
     </View>
   );
 }
 const MovieCard = ({ item, handleClick }) => {
-  //console.log(item)
+  const colors = useThemeColors(); // Lấy màu dựa trên darkMode
   return (
     <TouchableWithoutFeedback onPress={handleClick}>
       <View style={[styles.container]}>
@@ -108,12 +87,12 @@ const MovieCard = ({ item, handleClick }) => {
         <View>
           <View style={styles.rateContainer}>
             <CustomIcon name="star" style={styles.starIcon} type="Entypo" />
-            <Text style={styles.voteText}>
+            <Text style={[styles.voteText, {color: colors.white}]}>
               {item.vote_average} ({item.vote_count})
             </Text>
           </View>
 
-          <Text numberOfLines={1} style={styles.textTitle}>
+          <Text numberOfLines={1} style={[styles.textTitle, {color:colors.white}]}>
             {item.title}
           </Text>
 
@@ -121,8 +100,8 @@ const MovieCard = ({ item, handleClick }) => {
             {item.genre_ids.map((items, index) => {
               if (index >3 ) return 
               return (
-                <View key={items} style={styles.genreBox}>
-                  <Text style={styles.genreText}>{genres[items]}</Text>
+                <View key={items} style={[styles.genreBox, {borderColor: colors.white2}]}>
+                  <Text style={[styles.genreText, {color:colors.white2}]}>{genres[items]}</Text>
                 </View>
               );
             })}
@@ -137,12 +116,10 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   text: {
-    color: "white",
     fontSize: 20,
     margin: 16,
     fontWeight:'bold'
   },
-  container: {},
   cardImage: {
     aspectRatio: 2 / 3,
     borderRadius: BORDERRADIUS.radius_20,
@@ -150,7 +127,6 @@ const styles = StyleSheet.create({
   textTitle: {
     fontFamily: FONTFAMILY.poppins_regular,
     fontSize: FONTSIZE.size_24,
-    color: COLORS.White,
     textAlign: "center",
     paddingVertical: SPACING.space_10,
   },
@@ -168,7 +144,6 @@ const styles = StyleSheet.create({
   voteText: {
     fontFamily: FONTFAMILY.poppins_medium,
     fontSize: FONTSIZE.size_14,
-    color: COLORS.White,
   },
   genreContainer: {
     flexDirection: "row",
@@ -180,7 +155,6 @@ const styles = StyleSheet.create({
   genreBox: {
     alignItems: "center",
     flexBasis: "45%",
-    borderColor: COLORS.WhiteRGBA50,
     borderWidth: 1,
     paddingVertical: SPACING.space_4,
     paddingHorizontal: SPACING.space_10,
@@ -189,6 +163,5 @@ const styles = StyleSheet.create({
   genreText: {
     fontFamily: FONTFAMILY.poppins_regular,
     fontSize: FONTSIZE.size_10,
-    color: COLORS.WhiteRGBA75,
   },
 });
