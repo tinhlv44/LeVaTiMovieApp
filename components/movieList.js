@@ -24,7 +24,10 @@ export default function MovieList({ title, data, hideSeeAll, onPress }) {
         <Text style={[styles.text, {color: colors.white}]}>{title}</Text>
         {!hideSeeAll && (
           <TouchableOpacity onPress={onPress}>
-            <Text style={[styles.text, {color: Colors.textn300}]}>Xem tất cả</Text>
+            <Text style={[styles.text, {color: Colors.textn300}]}>
+              Xem tất cả
+              {/* See All */}
+            </Text>
           </TouchableOpacity>
         )}
       </View>

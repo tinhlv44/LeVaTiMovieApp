@@ -1,10 +1,13 @@
 import React from "react";
-import { TouchableOpacity, Text, StyleSheet } from "react-native";
+import { TouchableOpacity, Text, StyleSheet,Alert } from "react-native";
 import CustomIcon from "./CustomIcon";
 
 const GoogleLoginButton = ({ onPress }) => {
+  const handleFail = ()=>{
+    Alert.alert("Thông báo","Tính năng đang bảo trì.");
+  }
   return (
-    <TouchableOpacity style={styles.button} onPress={onPress}>
+    <TouchableOpacity style={styles.button} onPress={handleFail}>
       <CustomIcon name="google" size={24} color="#FFFFFF" type="AntDesign"/>
       <Text style={styles.buttonText}>Đăng nhập với Google</Text>
     </TouchableOpacity>

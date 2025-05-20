@@ -109,31 +109,48 @@ export default function PersonScreens() {
 
             <View style={styles.description}>
               <View style={styles.item}>
-                <Text style={styles.textHeader}>Giới tính</Text>
+                <Text style={styles.textHeader}>
+                  Giới tính
+                  {/* Gender */}
+                </Text>
                 <Text style={styles.textContent}>{person?.gender == 1 ? 'Female' : 'Male'}</Text>
               </View>
               <View style={styles.item}>
-                <Text style={styles.textHeader}>Ngày sinh</Text>
+                <Text style={styles.textHeader}>
+                  Ngày sinh
+                  {/* Birthday */}
+                </Text>
                 <Text style={styles.textContent}>{person?.birthday}</Text>
               </View>
               <View style={styles.item}>
-                <Text style={styles.textHeader}>Vai trò</Text>
+                <Text style={styles.textHeader}>
+                  Vai trò
+                  {/* Known for */}
+                </Text>
                 <Text style={styles.textContent}>{person?.known_for_department}</Text>
               </View>
               <View style={[styles.item, {borderRightWidth: 0,}]}>
-                <Text style={styles.textHeader}>Phổ biến</Text>
+                <Text style={styles.textHeader}>
+                  Phổ biến
+                  {/* Popularity */}
+                </Text>
                 <Text style={styles.textContent}>{person?.popularity}</Text>
               </View>
             </View>
             <View style={styles.bio}>
-              <Text style={[styles.textHeader,{color:colors.white}]}>Biography</Text>
+              <Text style={[styles.textHeader,{color:colors.white}]}>
+                Tiểu sử
+                {/* Biography */}
+              </Text>
               <Text style={styles.textContent}>
                 {person?.biography || 'N/A'}
               </Text>
             </View>
             {/* Phim tương tự */}
             <MovieList
-              title="Phim liên quan"
+              title=
+              "Phim liên quan"
+              //"Related Movies"
               hideSeeAll={true}
               data={personMovie}
             />

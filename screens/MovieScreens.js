@@ -75,7 +75,7 @@ export default function MovieScreen() {
   }, []);
   useEffect(() => {
     navigation.setOptions({
-      headerTitle: movie.title || "Movie Details",
+      headerTitle: movie.title || "Chi tiết phim",
       headerRight: () => (
         <TouchableOpacity
           style={styles.btnBack}
@@ -113,7 +113,7 @@ export default function MovieScreen() {
     const data = await fetchMovieDetails(id);
     if (data) {
       setMovie(data);
-      //saveMovieToFirestore(data); // Save movie to Firestore
+      saveMovieToFirestore(data); // Save movie to Firestore
     }
     setLoading(false);
   };
@@ -190,7 +190,7 @@ export default function MovieScreen() {
   const handleFavorite = async () => {
     try {
       if (!uid) {
-        ToastAndroid.show("Please Login", ToastAndroid.LONG);
+        ToastAndroid.show("Bạn chưa đăng nhập", ToastAndroid.LONG);
         return;
       }
 
@@ -212,17 +212,17 @@ export default function MovieScreen() {
         await updateDoc(docRef, {
           movies: arrayRemove(id), // Xoá movieId khỏi mảng
         });
-        ToastAndroid.show("Movie removed from favorites", ToastAndroid.LONG);
+        ToastAndroid.show("Phim đã được xóa khỏi danh sách yêu thích", ToastAndroid.LONG);
       } else {
         // Nếu chưa yêu thích, thì thêm
         await updateDoc(docRef, {
           movies: arrayUnion(id), // Thêm movieId vào mảng
         });
-        ToastAndroid.show("Movie added to favorites", ToastAndroid.LONG);
+        ToastAndroid.show("Phim đã được thêm vào danh sách yêu thích", ToastAndroid.LONG);
       }
     } catch (e) {
       ToastAndroid.show(
-        "Error adding movie to favorites: " + e.message,
+        "Đã xảy ra lỗi. Hãy thử lại.\nMã lỗi: " + e.message,
         ToastAndroid.LONG
       );
       console.log("Error adding movie to favorites: ", e);
@@ -315,7 +315,10 @@ export default function MovieScreen() {
             }
           }}
         >
-          <Text style={styles.buttonText}>Booking Movie</Text>
+          <Text style={styles.buttonText}>
+            {/* Booking Movie */}
+            Đặt vé phim
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -324,7 +327,7 @@ export default function MovieScreen() {
       {/* Similar movies */}
       {similarMovie.length > 0 && (
         <MovieList
-          title="Related Movies"
+          title="Phim liên quan"
           hideSeeAll={true}
           data={similarMovie}
         />

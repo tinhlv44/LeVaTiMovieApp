@@ -68,7 +68,11 @@ export default function SearchScreen() {
           contentContainerStyle={{ paddingBottom: 15 }}
           style={styles.scrollView}
         >
-          <Text style={[styles.text,{color:colors.white}]}>Kết quả ({results.length})</Text>
+          <Text style={[styles.text,{color:colors.white}]}>
+            Kết quả 
+            {/* Result  */}
+            ({results.length})
+          </Text>
           <View style={styles.results}>
             {results.map((item, index) => {
               return (

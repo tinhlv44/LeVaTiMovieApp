@@ -53,7 +53,10 @@ export default function TrendingMovie({ data }) {
   };
   return (
     <View style={styles.container}>
-      <Text style={[styles.text, {color: colors.white}]}>Xu hướng</Text>
+      <Text style={[styles.text, {color: colors.white}]}>
+        Xu hướng
+        {/* Trending */}
+      </Text>
 
       <Carousel
         data={data}
@@ -85,12 +88,12 @@ const MovieCard = ({ item, handleClick }) => {
         />
 
         <View>
-          <View style={styles.rateContainer}>
+          {/* <View style={styles.rateContainer}>
             <CustomIcon name="star" style={styles.starIcon} type="Entypo" />
             <Text style={[styles.voteText, {color: colors.white}]}>
               {item.vote_average} ({item.vote_count})
             </Text>
-          </View>
+          </View> */}
 
           <Text numberOfLines={1} style={[styles.textTitle, {color:colors.white}]}>
             {item.title}

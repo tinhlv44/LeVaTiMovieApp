@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Text, StyleSheet, Alert } from "react-native";
+import { Text, StyleSheet, Alert, ActivityIndicator } from "react-native";
 import { Formik } from "formik";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scrollview";
 import { auth } from '../firebaseConfig';
@@ -16,6 +16,7 @@ import GoogleLoginButton from "../components/Google";
 
 export const LoginScreen = ({ navigation }) => {
   const [errorState, setErrorState] = useState("");
+  const [loading, setLoading] = useState(false); // Thêm state loading
   const { passwordVisibility, handlePasswordVisibility, rightIcon } = useTogglePasswordVisibility();
   const [controller, dispatch] = useMyContextController();
   const { userLogin } = controller;
@@ -24,48 +25,33 @@ export const LoginScreen = ({ navigation }) => {
   const handleLogin = async (values) => {
     setErrorState("");
     const { email, password } = values;
+
+    // Bắt đầu loading
+    setLoading(true);
+
     try {
       await login(dispatch, email, password);
-      
-    }
-    catch (e){
-      console.log(e.message)
+    } catch (e) {
+      console.log(e.message);
       setErrorState("Email hoặc mật khẩu không đúng.");
+    } finally {
+      // Kết thúc loading
+      setLoading(false);
     }
-    // try {
-    //   // Gọi hàm login từ Context
-
-    //   console.log(userLogin.role)
-    //   // Kiểm tra và điều hướng theo role của người dùng
-    //   if (userLogin?.role === "admin") {
-    //     //navigation.navigate("Admin");
-    //   } else if (userLogin?.role === "customer") {
-    //     //navigation.navigate("Customer");
-    //   } else {
-    //     Alert.alert("Thông báo", "Không thể xác định vai trò người dùng.");
-    //   }
-    // } catch (error) {
-    //   setErrorState("Email hoặc mật khẩu không đúng.");
-    // }
   };
 
   useEffect(() => {
     if (userLogin) {
-      navigation.goBack()
-      // if (userLogin.role === "admin") {
-      //   //navigation.navigate("Admin");
-      // } else if (userLogin.role === "customer") {
-      //   //navigation.navigate("Customer");
-      // }
+      navigation.goBack();
     }
   }, [userLogin]);
 
   return (
-    <View style={[styles.container,{backgroundColor:colors.bgBlack}]}>
+    <View style={[styles.container, { backgroundColor: colors.bgBlack }]}>
       <KeyboardAwareScrollView enableOnAndroid={true}>
         {/* Logo và tiêu đề */}
         <View style={styles.logoContainer}>
-          <Logo size={40}/>
+          <Logo size={40} />
         </View>
 
         {/* Form đăng nhập */}
@@ -76,8 +62,6 @@ export const LoginScreen = ({ navigation }) => {
           }}
           validationSchema={loginValidationSchema}
           onSubmit={(values) => handleLogin(values)}
-          
-          
         >
           {({
             values,
@@ -122,20 +106,26 @@ export const LoginScreen = ({ navigation }) => {
               />
 
               {/* Hiển thị lỗi */}
-              {/* {errorState !== "" ? (
+              {errorState !== "" ? (
                 <FormErrorMessage error={errorState} visible={true} />
-              ) : null} */}
+              ) : null}
 
               {/* Nút Đăng nhập */}
-              <Button style={styles.button} onPress={handleSubmit}>
-                <Text style={styles.buttonText}>Đăng nhập</Text>
+              <Button style={styles.button} onPress={handleSubmit} disabled={loading}>
+                {loading ? (
+                  <ActivityIndicator color={Colors.white} />
+                ) : (
+                  <Text style={styles.buttonText}>Đăng nhập</Text>
+                )}
               </Button>
             </>
           )}
         </Formik>
-        <Text style={[styles.linear,{color:colors.white}]}>Hoặc</Text>
+
+        <Text style={[styles.linear, { color: colors.white }]}>Hoặc</Text>
         <FacebookLoginButton />
         <GoogleLoginButton />
+        
         {/* Button điều hướng đến màn hình Đăng ký */}
         <Button
           style={styles.borderlessButtonContainer}
@@ -160,11 +150,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 12,
-    paddingTop: 80
+    paddingTop: 80,
   },
   logoContainer: {
     alignItems: "center",
-    padding:30
+    padding: 30,
   },
   screenTitle: {
     fontSize: 32,
@@ -191,8 +181,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  linear:{
+  linear: {
     textAlign: 'center',
-    fontWeight: '600'
-  }
+    fontWeight: '600',
+  },
 });

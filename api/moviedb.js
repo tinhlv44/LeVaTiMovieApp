@@ -21,6 +21,7 @@ const personMoviesEndpoint = id =>  `${apiBaseUrl}/person/${id}/movie_credits?ap
 //fallcallImage
 export const fallcallImageMovie = 'https://th.bing.com/th/id/OIP.CXEc0Us30dFcEl8V0uLJEgHaLH?rs=1&pid=ImgDetMain'
 export const fallcallImageCast = 'https://thumbs.dreamstime.com/b/default-profile-picture-avatar-photo-placeholder-vector-illustration-default-profile-picture-avatar-photo-placeholder-vector-189495158.jpg'
+export const nullAvatarUser = 'https://img.freepik.com/premium-vector/user-icon-avatar-user-profile-person-icon-gender-neutral-silhouette-profile-picture-suitable_697711-1132.jpg'
 
 
 export const img500 = path => path ? `https://image.tmdb.org/t/p/w500${path}` : null

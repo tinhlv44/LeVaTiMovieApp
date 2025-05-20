@@ -25,6 +25,7 @@ import {
   useThemeColors,
 } from "../constants/Colors";
 import DarkModeToggle from "../components/DarkModeToggle";
+import { nullAvatarUser } from "../api/moviedb";
 
 const UserAccountScreen = ({ navigation }) => {
   const [controller, dispatch] = useMyContextController();
@@ -64,7 +65,7 @@ const UserAccountScreen = ({ navigation }) => {
               <View style={styles.profileContainer}>
                 <Image
                   source={{
-                    uri: `${storageBucketUrl}${encodeURIComponent(
+                    uri: userLogin?.avatar===null? nullAvatarUser : `${storageBucketUrl}${encodeURIComponent(
                       userLogin.avatar
                     )}?alt=media&timestamp=${new Date().getTime()}`,
                   }}
@@ -112,6 +113,7 @@ const UserAccountScreen = ({ navigation }) => {
                     onPress={() =>
                       navigation.navigate("ChangePassword", {
                         userId: uid,
+                        email: userLogin.email
                       })
                     }
                     type="MaterialCommunityIcons"
@@ -176,6 +178,7 @@ const UserAccountScreen = ({ navigation }) => {
               icon="info"
               heading="Thông tin"
               subheading="Tìm hiểu thêm"
+              onPress={() => navigation.navigate("AboutScreen")}
             />
             <View style={styles.toggleContainer}>
               <Text style={[styles.avatarText, { color: colors.white }]}>

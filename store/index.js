@@ -22,6 +22,8 @@ const reducer = (state, action) => {
             return { ...state, darkMode: !state.darkMode };
         case "SET_DARK_MODE": // Thêm case để đặt dark mode từ AsyncStorage
             return { ...state, darkMode: action.value };
+        case "UPDATE_AVATAR": // Cập nhật avatar local
+            return { ...state, userLogin: { ...state.userLogin, avatar: action.value } };
         default:
             return state;
     }
@@ -102,7 +104,8 @@ const login = async (dispatch, email, password) => {
             Alert.alert('Thông báo', 'Không tìm thấy thông tin người dùng.');
         }
     } catch (e) {
-        Alert.alert('Thông báo', 'Sai email hoặc password');
+        //Alert.alert('Thông báo', 'Sai email hoặc password');
+        Alert.alert('Failed', "Wrong email or passowrd.");
         console.log("Lỗi khi đăng nhập:", e);
     }
 };
@@ -119,11 +122,14 @@ const logout = async (dispatch) => {
 const toggleDarkMode = (dispatch) => {
     dispatch({ type: "TOGGLE_DARK_MODE" });
 };
-
+const updateAvatarLocally = (dispatch, newAvatarUrl) => {
+    dispatch({ type: "UPDATE_AVATAR", value: newAvatarUrl });
+};
 export {
     MyContextControllerProvider,
     useMyContextController,
     login,
     logout,
-    toggleDarkMode
+    toggleDarkMode,
+    updateAvatarLocally
 };

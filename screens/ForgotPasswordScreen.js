@@ -12,20 +12,20 @@ export const ForgotPasswordScreen = ({navigation}) => {
   const [errorState, setErrorState] = useState("");
   const colors = useThemeColors(); // Lấy màu dựa trên darkMode
   const handleSendPasswordResetEmail = (values) => {
-    // const { email } = values;
-    //   sendPasswordResetEmail(auth,email)
-    //   .then(() => {
-    //     console.log("Thành công: Link tạo mới mật khẩu đã được gửi qua email.");
-    //     Alert.alert("Thành công","Link tạo mới mật khẩu đã được gửi qua email.");
-    //   })
-    //   .catch((error) => {
-    //     //Alert.alert("Error",error.message);
-    //     //setErrorState(error.message)
-    //     setErrorState('Đã có lỗi xảy ra! Hãy thử lại.')
-    //     console.log(error)
+    const { email } = values;
+      sendPasswordResetEmail(auth,email)
+      .then(() => {
+        console.log("Thành công: Link tạo mới mật khẩu đã được gửi qua email.");
+        Alert.alert("Thành công","Link tạo mới mật khẩu đã được gửi qua email.");
+      })
+      .catch((error) => {
+        //Alert.alert("Error",error.message);
+        //setErrorState(error.message)
+        setErrorState('Đã có lỗi xảy ra! Hãy thử lại.')
+        console.log(error)
 
-    //   }
-    //   );
+      }
+      );
   };
   return (
     <View style={[styles.container,{backgroundColor:colors.bgBlack}]}>
@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 12,
-    marginTop: 60
+    paddingTop: 60
   },
   innercontainer: {
     alignItems: "center",

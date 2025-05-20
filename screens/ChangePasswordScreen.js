@@ -10,33 +10,56 @@ import {
 } from "react-native";
 import { Formik } from "formik";
 import { changePasswordValidationSchema } from "../utils"; // Import validation schema
-import { getAuth, updatePassword } from "firebase/auth"; // Import Firebase Auth
+import { getAuth, updatePassword, reauthenticateWithCredential, EmailAuthProvider, signInWithEmailAndPassword } from "firebase/auth"; // Import Firebase Auth
+import { auth } from '../firebaseConfig';
 import { Colors, useThemeColors } from "../constants/Colors";
 
-const ChangePasswordScreen = ({ route }) => {
-  const { userId } = route.params; // Get userId from params
+const ChangePasswordScreen = ({navigation, route }) => {
+  const { email } = route.params; // Get userId from params
   const [loading, setLoading] = useState(false);
   const colors = useThemeColors(); // Lấy màu dựa trên darkMode
-
+  const user = auth.currentUser;
   const handleChangePassword = async (values) => {
     const { currentPassword, newPassword } = values;
     setLoading(true);
-    const auth = getAuth();
-    const user = auth.currentUser;
 
-    try {
-      // Re-authenticate user with current password
-      const credential = firebase.auth.EmailAuthProvider.credential(user.email, currentPassword);
-      await user.reauthenticateWithCredential(credential);
+    if (user) {
+      try {
+        // Yêu cầu đăng nhập lại với email và mật khẩu hiện tại
+        await signInWithEmailAndPassword(auth, user.email, currentPassword);
+        
+        // Thay đổi mật khẩu
+        await updatePassword(user, newPassword);
+        alert('Mật khẩu đã được thay đổi thành công!');
+        console.log('Mật khẩu đã được thay đổi thành công!');
+        setLoading(false);
+        navigation.goBack()
+      } catch (error) {
+        // Bắt lỗi và hiển thị thông báo phù hợp
+        if (error.code === 'auth/wrong-password') {
+          console.log('Mật khẩu hiện tại không chính xác.');
+          alert('Mật khẩu hiện tại không chính xác. Vui lòng thử lại.');
+        } else if (error.code === 'auth/weak-password') {
+          console.log('Mật khẩu mới quá yếu. Cần ít nhất 6 ký tự.');
+          alert('Mật khẩu mới quá yếu. Cần ít nhất 6 ký tự.');
+        } else if (error.code === 'auth/requires-recent-login') {
+          console.log('Cần đăng nhập lại để thực hiện thay đổi này.');
+          alert('Cần đăng nhập lại để thực hiện thay đổi này.');
+        } else if (error.code === 'auth/user-token-expired') {
+          console.log('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+          alert('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+        } else {
+          console.log('Lỗi khi thay đổi mật khẩu:', error.message);
+          alert('Đã xảy ra lỗi khi thay đổi mật khẩu. Vui lòng thử lại.');
+        }
+      }
+      finally{
+        setLoading(false);
 
-      // Update password
-      await updatePassword(user, newPassword);
-      Alert.alert("Đổi mật khẩu thành công!");
-    } catch (error) {
-      console.error("Error changing password:", error);
-      Alert.alert("Đổi mật khẩu thất bại! Vui lòng kiểm tra lại.");
-    } finally {
-      setLoading(false);
+      }
+    } else {
+      console.log('Người dùng không được xác thực.');
+      alert('Người dùng không được xác thực. Vui lòng đăng nhập.');
     }
   };
 

@@ -41,11 +41,13 @@ export const SignupScreen = ({ navigation }) => {
         email,
         phone,
         address,
-        role: "customer"
+        role: "customer",
+        avatar: null,
+        createdAl: new Date()
       });
   
       // Thông báo cho người dùng về việc cần xác thực email
-      Alert.alert("Thông báo", "Vui lòng xác nhận email của bạn qua liên kết đã được gửi.");
+      Alert.alert("Thông báo", "Đăng ký thành công.\nVui lòng xác nhận email của bạn qua liên kết đã được gửi.");
   
       // Chuyển hướng đến màn hình đăng nhập
       navigation.navigate("Login");

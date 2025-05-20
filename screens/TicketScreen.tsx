@@ -134,11 +134,11 @@ const TicketScreen = ({ navigation, route }) => {
             <Text style={styles.text}>{movie.title}</Text>
             <View style={styles.ticketSeatContainer}>
               <View style={styles.subtitleContainer}>
-                <Text style={styles.subheading}>Hall</Text>
+                <Text style={styles.subheading}>Rạp</Text>
                 <Text style={styles.subtitle}>{ticketData?.cinemaId}</Text>
               </View>
               <View style={styles.subtitleContainer}>
-                <Text style={styles.subheading}>Seats</Text>
+                <Text style={styles.subheading}>Số Ghế</Text>
                 <Text style={styles.subtitle}>
                   {ticketData?.seats.join(", ")}
                 </Text>
@@ -151,15 +151,15 @@ const TicketScreen = ({ navigation, route }) => {
                 ticketData?.movieId
               }, Seats: ${ticketData?.seats.join(", ")}, State: ${
                 ticketData?.state
-              }`}
+              }, ID: ${ticketData?.id.substring(0, 5)}`}
               size={150} // Kích thước mã QR
               color="black"
               backgroundColor="white"
             />
             {ticketData?.state == 0 ? (
-              <TouchableOpacity style={styles.shareButton}>
+              <TouchableOpacity style={styles.shareButton} onPress={() => navigation.navigate('Payment', { bookingId: ticketData?.id })}>
                 <CustomIcon name="payment" style={styles.shareIcon} />
-                <Text style={styles.shareText}>Payment</Text>
+                <Text style={styles.shareText}>Thanh toán</Text>
               </TouchableOpacity>
             ):(
               <></>

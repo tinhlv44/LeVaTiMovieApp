@@ -216,3 +216,51 @@ export const getShowtimesForNext7Days = async () => {
 };
 
 // Gọi hàm
+
+export const getMoviesFromShowtimesToday = async () => {
+  try {
+    const showtimesCollection = collection(db, 'showtimes');
+    const moviesCollection = collection(db, 'movies'); // Tạo tham chiếu đến bảng movies
+    const today = moment().format('YYYY-MM-DD'); // Ngày hôm nay định dạng yyyy-mm-dd
+
+    // Lấy suất chiếu cho ngày hôm nay
+    const todayDocRef = doc(showtimesCollection, today);
+    const todayDocSnap = await getDoc(todayDocRef);
+
+    if (!todayDocSnap.exists()) {
+      console.log(`Tài liệu cho ngày hôm nay (${today}) không tồn tại.`);
+      return [];
+    }
+
+    const todayData = todayDocSnap.data();
+    const movieIds = new Set(); // Sử dụng Set để tránh trùng lặp
+
+    // Duyệt qua các rạp (cinemas) trong dữ liệu suất chiếu
+    for (const showtimes of Object.values(todayData)) {
+      if (showtimes) {
+        showtimes.forEach(showtime => {
+          if (showtime.movieId) {
+            movieIds.add(showtime.movieId); // Thêm movieId vào Set
+          }
+        });
+      }
+    }
+
+    // Lấy danh sách phim từ bảng movies
+    const moviesSnapshot = await getDocs(moviesCollection);
+    const moviesList = [];
+
+    // Duyệt qua danh sách phim và chỉ lấy phim có trong movieIds
+    moviesSnapshot.forEach((doc) => {
+      const movie = doc.data();
+      if (movieIds.has(movie.id)) {
+        moviesList.push(movie); // Thêm toàn bộ thuộc tính của phim vào danh sách
+      }
+    });
+    //console.log(moviesList)
+    return moviesList; // Trả về danh sách phim có suất chiếu trong ngày hôm nay
+  } catch (error) {
+    console.error('Error fetching movies from showtimes: ', error);
+    return [];
+  }
+};

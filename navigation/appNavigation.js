@@ -17,6 +17,7 @@ import { useThemeColors } from "../constants/Colors";
 import TicketScreen from "../screens/TicketScreen";
 import FavoriteMoviesScreen from "../screens/FavoriteMoviesScreen";
 import PaymentScreen from "../screens/PaymentScreen";
+import AboutScreen from "../screens/AboutScreen";
 
 const Stack = createStackNavigator();
 
@@ -41,6 +42,7 @@ const AppStack = () => {
       component={LoginScreen} 
       options={{
         title:'Đăng nhập'
+        //title:'Login'
       }}
     />
     <Stack.Screen 
@@ -48,6 +50,7 @@ const AppStack = () => {
       component={SignupScreen} 
       options={{
         title:'Đăng ký'
+        //title:'Register'
       }}
     />
     <Stack.Screen 
@@ -55,6 +58,7 @@ const AppStack = () => {
       component={ForgotPasswordScreen} 
       options={{
         title:'Quên mật khẩu'
+        //title:'Forgot Password'
       }}
     />
     <Stack.Screen
@@ -80,6 +84,7 @@ const AppStack = () => {
       name="UpdateUser"
       options={{
         title: "Thay đổi thông tin",
+        //title: "Change Information",
       }}
       component={UpdateUserScreen}
       
@@ -89,6 +94,7 @@ const AppStack = () => {
       name="ChangePassword"
       options={{
         title: "Đổi mật khẩu",
+        //title: "Change Password",
       }}
       component={ChangePasswordScreen}
     />
@@ -96,6 +102,7 @@ const AppStack = () => {
       name="FavoriteMovies"
       options={{
         title: "Yêu thích",
+        //title: "Favorite Movies",
       }}
       component={FavoriteMoviesScreen}
     />
@@ -109,6 +116,7 @@ const AppStack = () => {
       name="TicketScreen"
       options={{
         title:'Chi tiết vé'
+        //title:'Ticket Detail'
       }}
       component={TicketScreen}
     />
@@ -116,8 +124,19 @@ const AppStack = () => {
       name="Payment"
       options={{
         title:'Thanh toán'
+        //title:'Payment'
+        
       }}
       component={PaymentScreen}
+    />
+    <Stack.Screen
+      name="AboutScreen"
+      options={{
+        title:'Thông tin'
+        //title:'Payment'
+        
+      }}
+      component={AboutScreen}
     />
   </Stack.Navigator>
 )};

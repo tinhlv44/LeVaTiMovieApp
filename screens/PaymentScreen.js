@@ -1,20 +1,24 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import { FontAwesome } from "@expo/vector-icons"; // Sử dụng cho PayPal
-import { MaterialIcons } from "@expo/vector-icons"; // Sử dụng cho Google Pay
+import { useNavigation, useRoute } from "@react-navigation/native";
 import PaypalButton from "../components/Paypal";
 import GooglePayButton from "../components/GooglePay";
-import { useNavigation } from "@react-navigation/native";
 import { Button } from "../components";
 import { Colors, SPACING } from "../constants/Colors";
 
 const PaymentScreen = () => {
   const navigation = useNavigation();
+  const route = useRoute(); // Lấy thông tin từ route
+  const { bookingId } = route.params; // Lấy bookingId từ params truyền từ màn hình trước
+  console.log(bookingId)
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Chọn phương thức thanh toán</Text>
-      <PaypalButton />
-      <GooglePayButton />
+      
+      {/* Truyền bookingId vào các component thanh toán */}
+      <PaypalButton id={bookingId} />
+      <GooglePayButton id={bookingId} />
+      
       <Button style={styles.button} onPress={() => navigation.pop(2)}>
         <Text style={styles.buttonText}>Thanh toán sau</Text>
       </Button>

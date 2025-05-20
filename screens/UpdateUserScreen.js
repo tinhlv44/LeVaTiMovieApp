@@ -16,6 +16,8 @@ import { uploadBytes, ref } from "firebase/storage"; // Import necessary functio
 import { storage, storageBucketUrl } from "../firebaseConfig"; // Import Firebase Storage
 import { updateUserValidationSchema } from "../utils";
 import { Colors, useThemeColors } from "../constants/Colors";
+import { nullAvatarUser } from "../api/moviedb";
+import { updateAvatarLocally, useMyContextController } from "../store";
 
 
 
@@ -25,11 +27,12 @@ const UpdateUserScreen = ({ route }) => {
     fullName: "",
     phone: "",
     address: "",
-    avatar: "",
+    avatar: null,
   });
   const [selectedImage, setSelectedImage] = useState(null);
   
   const colors = useThemeColors(); // Lấy màu dựa trên darkMode
+  const [controller, dispatch] = useMyContextController();
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -40,7 +43,7 @@ const UpdateUserScreen = ({ route }) => {
           const data = userDoc.data();
           setInitialValues(data);
           setSelectedImage(
-            `${storageBucketUrl}${encodeURIComponent(data.avatar)}?alt=media&timestamp=${new Date().getTime()}` || null
+            data.avatar !==null?`${storageBucketUrl}${encodeURIComponent(data.avatar)}?alt=media&timestamp=${new Date().getTime()}` : nullAvatarUser
           ); // Set selectedImage based on existing avatar
         } else {
           Alert.alert("Người dùng không tồn tại!");
@@ -68,7 +71,8 @@ const UpdateUserScreen = ({ route }) => {
       }
       await updateDoc(doc(db, "users", userId), updatedValues);
       Alert.alert("Thông tin người dùng đã được cập nhật thành công!");
-      setSelectedImage(null); // Clear selected image after update
+      //setSelectedImage(null); // Clear selected image after update
+      updateAvatarLocally(dispatch, `avatars/${userId}`);
 
     } catch (error) {
       console.error("Error updating user:", error);
@@ -102,11 +106,11 @@ const UpdateUserScreen = ({ route }) => {
           source={{
             uri: selectedImage
               ? selectedImage
-              : initialValues.avatar
+              : initialValues.avatar !== null
               ? `${storageBucketUrl}${encodeURIComponent(
                   initialValues.avatar
                 )}?alt=media`
-              : null,
+              : nullAvatarUser,
           }}
           style={styles.avatar}
         />

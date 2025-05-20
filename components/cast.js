@@ -14,7 +14,10 @@ export default function Cast({ cast, navigation }) {
   const colors = useThemeColors(); // Lấy màu dựa trên darkMode
   return (
     <View style={styles.container}>
-      <Text style={[styles.header,{color:colors.white}]}>Diễn viên chính</Text>
+      <Text style={[styles.header,{color:colors.white}]}>
+        Diễn viên
+        {/* Cast */}
+      </Text>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
